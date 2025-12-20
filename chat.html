@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>WebChat</title><link rel="icon" type="image/png" href="chat.png">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:Arial;background:#ece5dd}
+#app{display:flex;flex-direction:column;height:100vh}
+
+/* HEADER */
+#header{
+  background:#075e54;
+  color:#fff;
+  padding:12px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  box-shadow:0 2px 5px rgba(0,0,0,.1);
+}
+
+#user-info{
+  font-size:16px;
+  font-weight:500;
+}
+
+/* TOMBOL LOGOUT */
+#logoutBtn{
+  background:transparent;
+  border:none;
+  color:#fff;
+  font-size:20px;
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:background .15s ease;
+}
+#logoutBtn:hover{background:rgba(255,255,255,.15);}
+#logoutBtn:active{background:rgba(255,255,255,.25);}
+
+/* LOADING & EMPTY STATES */
+.loading, .empty-state{
+  text-align:center;
+  padding:40px 20px;
+  color:#666;
+}
+.empty-state-icon{
+  font-size:48px;
+  margin-bottom:16px;
+}
+.empty-state h3{
+  margin:8px 0;
+  color:#333;
+}
+.empty-state p{
+  font-size:14px;
+  opacity:.8;
+}
+
+/* CHAT CONTAINER */
+#chat-box{
+  flex:1;
+  overflow-y:auto;
+  padding:10px;
+  background:url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%239C92AC' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+  background-attachment:fixed;
+}
+
+/* PESAN */
+.pesan{
+  position:relative;
+  max-width:70%;
+  padding:3px 12px;
+  margin:6px 0;
+  border-radius:8px;
+  font-size:14px;
+  line-height:1.4;
+  clear:both;
+  word-wrap:break-word;
+}
+.saya{background:#dcf8c6;float:right;border-top-right-radius:0}
+.lawan{background:#fff;float:left;border-top-left-radius:0}
+
+.pesan.shift-left{
+  transform:translateX(-35px);
+  transition:transform .15s ease;
+}
+
+.pesan small{
+  display:block;
+  font-size:11px;
+  font-weight:bold;
+  color:#555;
+  margin-bottom:4px;
+}
+
+/* FILE CONTAINER */
+.file-container {
+  margin: 8px 0;
+  max-width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.file-preview {
+  position: relative;
+  max-width: 300px;
+}
+
+.file-preview img, .file-preview video {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: 8px;
+  display: block;
+  cursor: pointer;
+}
+
+.file-info {
+  background: rgba(0,0,0,0.05);
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.file-name {
+  font-size: 12px;
+  font-weight: bold;
+  color: #333;
+  word-break: break-all;
+}
+
+.file-size {
+  font-size: 11px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.file-download {
+  display: inline-block;
+  background: #128c7e;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-size: 12px;
+  margin-top: 6px;
+  transition: background .2s;
+}
+
+.file-download:hover {
+  background: #075e54;
+}
+
+/* HIGHLIGHT PESAN */
+.pesan.highlight{
+  animation:flash .8s ease;
+}
+@keyframes flash{
+  0%{background:#fff59d}
+  100%{background:inherit}
+}
+
+/* REPLY PREVIEW */
+.reply-preview{
+  background:#f1f1f1;
+  padding:4px 8px;
+  border-left:3px solid #128c7e;
+  margin-bottom:1px;
+  font-size:12px;
+  cursor:pointer;
+  border-radius:4px;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.reply-preview:hover{
+  background:#e0f2f1;
+}
+
+.edited{
+  font-size:10px;
+  color:#666;
+  margin-left:6px;
+  font-style:italic;
+}
+
+.timestamp{
+  font-size:10px;
+  color:#999;
+  text-align:right;
+  margin-top:2px;
+  float:right;
+  margin-left:8px;
+}
+
+/* MENU BUBBLE */
+.bubble-menu{
+  position:absolute;
+  top:6px;
+  bottom:6px;
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  gap:4px;
+  z-index:1000
+}
+.bubble-menu.outside{right:-32px}
+.bubble-menu.inside{
+  right:6px;
+  animation:slideOut .15s ease forwards
+}
+@keyframes slideOut{
+  from{opacity:0;transform:translateX(0)}
+  to{opacity:1;transform:translateX(38px)}
+}
+
+.bubble-menu button{
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  border:none;
+  background:#fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.25);
+  cursor:pointer;
+  font-size:12px;
+  padding:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.bubble-menu button:hover{
+  background:#e0f2f1;
+  transform:scale(1.15);
+  box-shadow:0 2px 5px rgba(0,0,0,.2);
+}
+
+/* INPUT AREA */
+#input-area{
+  background:#f0f0f0;
+  padding:12px 16px;
+  border-top:1px solid #ddd;
+}
+
+/* REPLY BAR */
+#reply-bar{
+  display:none;
+  background:#e0f2f1;
+  border-left:4px solid #128c7e;
+  padding:8px 12px;
+  margin-bottom:8px;
+  justify-content:space-between;
+  align-items:center;
+  border-radius:4px;
+}
+#reply-text{
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:85%;
+  flex:1;
+}
+#reply-bar span{
+  cursor:pointer;
+  font-weight:bold;
+  color:#128c7e;
+  padding:4px;
+  border-radius:50%;
+  width:24px;
+  height:24px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+#reply-bar span:hover{
+  background:rgba(0,0,0,.1);
+}
+
+/* INPUT ROW */
+#input-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* INPUT */
+#input{
+  flex:1;
+  padding:12px 16px;
+  border-radius:24px;
+  border:1px solid #ccc;
+  outline:none;
+  font-size:14px;
+  background:#fff;
+  min-height:44px;
+  resize:none;
+  font-family:inherit;
+  order: 1; /* Tambahkan ini */
+}
+#input:focus{
+  border-color:#128c7e;
+  box-shadow:0 0 0 2px rgba(18,140,126,.1);
+}
+
+/* FILE UPLOAD BUTTON */
+#fileBtn{
+  width:34px;
+  height:34px;
+  border-radius:50%;
+  border:none;
+  background:#128c7e;
+  color:#fff;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all .15s ease;
+  flex-shrink:0;
+  order: 3; /* Ubah menjadi 3 */
+}
+#fileBtn:hover{
+  background:#555;
+  box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+
+/* SEND BUTTON */
+#sendBtn{
+  width:44px;
+  height:44px;
+  border-radius:50%;
+  border:none;
+  background:#128c7e;
+  color:#fff;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all .15s ease;
+  flex-shrink:0;
+  order: 4; /* Ubah menjadi 4 */
+}
+#sendBtn:hover{
+  background:#075e54;
+  box-shadow:0 2px 8px rgba(0,0,0,.2);
+}
+#sendBtn:active{
+  transform:scale(0.95);
+}
+#sendBtn:disabled{
+  background:#b2dfdb;
+  cursor:not-allowed;
+  transform:none;
+  box-shadow:none;
+}
+
+/* PROGRESS BAR */
+.progress-container {
+  width: 100%;
+  background: #e0e0e0;
+  border-radius: 4px;
+  margin: 8px 0;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 6px;
+  background: #128c7e;
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* MODAL PREVIEW */
+#preview-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  z-index: 2000;
+  justify-content: center;
+  align-items: center;
+}
+
+#preview-content {
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+#preview-content img, #preview-content video {
+  max-width: 100%;
+  max-height: 80vh;
+  display: block;
+}
+
+#close-preview {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: white;
+  font-size: 30px;
+  cursor: pointer;
+  background: rgba(0,0,0,0.5);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* FILE UPLOAD PREVIEW */
+#upload-preview {
+  display: none;
+  background: #f8f8f8;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 2px dashed #128c7e;
+}
+
+.preview-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  background: white;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.preview-name {
+  flex: 1;
+  margin-left: 12px;
+  font-size: 14px;
+  word-break: break-all;
+}
+
+.preview-remove {
+  color: #ff4444;
+  cursor: pointer;
+  font-size: 18px;
+  margin-left: 8px;
+}
+</style>
+</head>
+
+<body>
+<div id="app">
+
+  <div id="header">
+    <div id="user-info">WebChat</div>
+    <button id="logoutBtn" onclick="logout()" title="Logout">⎋</button>
+  </div>
+
+  <div id="chat-box">
+    <div class="loading">Memuat percakapan...</div>
+  </div>
+
+  <div id="input-area">
+    <div id="reply-bar">
+      <div id="reply-text"></div>
+      <span onclick="cancelReply()">✕</span>
+    </div>
+
+    <div id="upload-preview">
+      <!-- Preview file akan muncul di sini -->
+    </div>
+
+<div id="input-row">
+  <textarea id="input" placeholder="Ketik pesan..." rows="1"></textarea>
+  <button id="fileBtn" title="Unggah file">
+    📎
+  </button>
+  <button id="sendBtn" onclick="kirim()">
+    <span style="margin-left:2px">➤</span>
+  </button>
+</div>
+  </div>
+
+  <!-- Modal untuk preview file -->
+  <div id="preview-modal" onclick="closePreview()">
+    <div id="preview-content" onclick="event.stopPropagation()">
+      <!-- Konten preview akan dimuat di sini -->
+    </div>
+    <div id="close-preview" onclick="closePreview()">✕</div>
+  </div>
+
+  <!-- Input file tersembunyi -->
+  <input type="file" id="file-input" multiple style="display:none;">
+
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut }
+from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, query, orderBy,
+  onSnapshot, doc, getDoc, updateDoc, deleteDoc, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+// Import Supabase client
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+
+/* KONFIGURASI SUPABASE */
+// GANTI dengan konfigurasi Supabase Anda
+const supabaseUrl = 'https://jlihaulpdflnccgcjaud.supabase.co' // Ganti dengan URL Supabase Anda
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpsaWhhdWxwZGZsbmNjZ2NqYXVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxMjY2MDYsImV4cCI6MjA4MTcwMjYwNn0.vncAguYh88c1ZiI_c1-YsqL4aEXw2NdLpnwKJs3Z-7g' // Ganti dengan anon key Anda
+const supabase = createClient(supabaseUrl, supabaseAnonKey)
+
+/* FIREBASE (untuk auth dan chat saja) */
+const firebaseConfig = {
+  apiKey: "AIzaSyAEbWsT4pkpvdgTtb5AR8haclGirIfKgEw",
+  authDomain: "webchat-saya.firebaseapp.com",
+  projectId: "webchat-saya",
+  storageBucket: "webchat-saya.firebasestorage.app",
+  messagingSenderId: "57188543238",
+  appId: "1:57188543238:web:a6729df4e05ce462960c87"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+/* STATE */
+let username="", replyData=null;
+let isSending = false;
+let filesToUpload = [];
+
+/* ELEMENT */
+const chatBox=document.getElementById("chat-box");
+const replyBar=document.getElementById("reply-bar");
+const replyText=document.getElementById("reply-text");
+const input=document.getElementById("input");
+const sendBtn=document.getElementById("sendBtn");
+const fileBtn=document.getElementById("fileBtn");
+const fileInput=document.getElementById("file-input");
+const uploadPreview=document.getElementById("upload-preview");
+const previewModal=document.getElementById("preview-modal");
+const previewContent=document.getElementById("preview-content");
+
+/* UTIL FUNCTIONS */
+function sanitize(text){
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function formatTime(timestamp){
+  if(!timestamp) return '';
+  const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+  return date.toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+}
+
+function formatFileSize(bytes){
+  if(bytes < 1024) return bytes + ' B';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(1) + ' MB';
+}
+
+function autoResizeTextarea(textarea){
+  textarea.style.height = 'auto';
+  const newHeight = Math.min(textarea.scrollHeight, 120);
+  textarea.style.height = newHeight + 'px';
+  updateSend();
+}
+
+function updateSend(){
+  const hasContent = (input.value.trim().length > 0 || filesToUpload.length > 0) && !isSending;
+  sendBtn.disabled = !hasContent;
+  
+  if(hasContent){
+    sendBtn.style.opacity = "1";
+    sendBtn.style.cursor = "pointer";
+  }else{
+    sendBtn.style.opacity = "0.7";
+    sendBtn.style.cursor = "not-allowed";
+  }
+}
+
+/* FILE UPLOAD FUNCTIONS */
+fileBtn.onclick = () => {
+  fileInput.click();
+};
+
+fileInput.onchange = (e) => {
+  const files = Array.from(e.target.files);
+  if(files.length === 0) return;
+  
+  files.forEach(file => {
+    if(filesToUpload.length >= 5) {
+      alert("Maksimal 5 file sekaligus");
+      return;
+    }
+    
+    // Validasi ukuran file (maks 50MB untuk Supabase free tier)
+    if(file.size > 50 * 1024 * 1024) {
+      alert(`File ${file.name} terlalu besar (maks 50MB)`);
+      return;
+    }
+    
+    // Validasi tipe file
+    const allowedTypes = [
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+      'video/mp4', 'video/mpeg', 'video/webm',
+      'audio/mpeg', 'audio/wav', 'audio/ogg',
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'text/plain'
+    ];
+    
+    if(!allowedTypes.includes(file.type) && !file.type.startsWith('image/') && !file.type.startsWith('video/')) {
+      alert(`Tipe file ${file.name} tidak didukung`);
+      return;
+    }
+    
+    filesToUpload.push(file);
+    showUploadPreview();
+  });
+  
+  fileInput.value = '';
+  updateSend();
+};
+
+function showUploadPreview() {
+  uploadPreview.innerHTML = '';
+  uploadPreview.style.display = 'block';
+  
+  filesToUpload.forEach((file, index) => {
+    const previewDiv = document.createElement('div');
+    previewDiv.className = 'preview-item';
+    
+    let icon = '📄';
+    if(file.type.startsWith('image/')) icon = '🖼️';
+    else if(file.type.startsWith('video/')) icon = '🎬';
+    else if(file.type.startsWith('audio/')) icon = '🎵';
+    
+    previewDiv.innerHTML = `
+      <span>${icon}</span>
+      <div class="preview-name">${file.name} (${formatFileSize(file.size)})</div>
+      <span class="preview-remove" onclick="removeFile(${index})">✕</span>
+    `;
+    
+    uploadPreview.appendChild(previewDiv);
+  });
+}
+
+window.removeFile = (index) => {
+  filesToUpload.splice(index, 1);
+  if(filesToUpload.length === 0) {
+    uploadPreview.style.display = 'none';
+  } else {
+    showUploadPreview();
+  }
+  updateSend();
+};
+
+async function uploadToSupabase(file) {
+  try {
+    // Buat nama file unik dengan timestamp
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `chat-files/${fileName}`;
+    
+    // Upload ke Supabase Storage
+    const { data, error } = await supabase.storage
+      .from('chat-storage') // Nama bucket di Supabase Storage
+      .upload(filePath, file);
+    
+    if (error) {
+      throw error;
+    }
+    
+    // Dapatkan URL publik
+    const { data: urlData } = supabase.storage
+      .from('chat-storage')
+      .getPublicUrl(filePath);
+    
+    return {
+      url: urlData.publicUrl,
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      path: filePath
+    };
+    
+  } catch (error) {
+    console.error('Upload error:', error);
+    throw error;
+  }
+}
+
+/* AUTH */
+onAuthStateChanged(auth,async user=>{
+  if(!user){
+    if(!window.location.href.includes('webchat.html')){
+      location.href="webchat.html";
+    }
+    return;
+  }
+  
+  try{
+    const snap=await getDoc(doc(db,"usernames",user.uid));
+    username=snap.exists()?snap.data().username:"Anonim";
+    document.getElementById("user-info").textContent=`${username}`;
+    listenChat();
+  }catch(error){
+    console.error("Auth error:", error);
+  }
+});
+
+/* CHAT LISTENER */
+function listenChat(){
+  const q=query(collection(db,"pesan"),orderBy("waktu"));
+  
+  onSnapshot(q,s=>{
+    const loadingEl = chatBox.querySelector('.loading');
+    if(loadingEl) loadingEl.remove();
+    
+    chatBox.innerHTML="";
+    
+    if(s.empty){
+      chatBox.innerHTML=`
+        <div class="empty-state">
+          <div class="empty-state-icon">💬</div>
+          <h3>Belum ada percakapan</h3>
+          <p>Mulai percakapan dengan mengirim pesan pertama!</p>
+        </div>
+      `;
+      return;
+    }
+    
+    s.forEach(d=>renderMessage(d));
+    chatBox.scrollTop=chatBox.scrollHeight;
+  }, error => {
+    console.error("Chat error:", error);
+  });
+}
+
+/* RENDER MESSAGE */
+function renderMessage(d){
+  const data=d.data();
+  const isMe=data.user===username;
+
+  const msgDiv=document.createElement("div");
+  msgDiv.className="pesan "+(isMe?"saya":"lawan");
+  msgDiv.id="msg-"+d.id;
+  
+  let htmlContent = `<small>${sanitize(data.user)}</small>`;
+  
+  if(data.reply){
+    const replyPreview=document.createElement("div");
+    replyPreview.className="reply-preview";
+    replyPreview.textContent=`${data.reply.user}: ${data.reply.text}`;
+    replyPreview.onclick = ()=> scrollToMessage(data.reply.id);
+    msgDiv.appendChild(replyPreview);
+  }
+  
+  // Tampilkan file jika ada
+  if(data.files && data.files.length > 0) {
+    const fileContainer = document.createElement("div");
+    fileContainer.className = "file-container";
+    
+    data.files.forEach(file => {
+      const filePreview = document.createElement("div");
+      filePreview.className = "file-preview";
+      
+      if(file.type.startsWith('image/')) {
+        const img = document.createElement("img");
+        img.src = file.url;
+        img.alt = file.name;
+        img.onclick = () => showPreview(file.url, 'image');
+        filePreview.appendChild(img);
+      } else if(file.type.startsWith('video/')) {
+        const video = document.createElement("video");
+        video.src = file.url;
+        video.controls = true;
+        video.preload = "metadata";
+        filePreview.appendChild(video);
+      } else if(file.type.startsWith('audio/')) {
+        const audio = document.createElement("audio");
+        audio.src = file.url;
+        audio.controls = true;
+        filePreview.appendChild(audio);
+      } else {
+        const fileInfo = document.createElement("div");
+        fileInfo.className = "file-info";
+        fileInfo.innerHTML = `
+          <div class="file-name">${file.name}</div>
+          <div class="file-size">${formatFileSize(file.size)}</div>
+          <a href="${file.url}" class="file-download" download="${file.name}" target="_blank">Unduh</a>
+        `;
+        filePreview.appendChild(fileInfo);
+      }
+      
+      fileContainer.appendChild(filePreview);
+    });
+    
+    msgDiv.appendChild(fileContainer);
+  }
+  
+  // Tampilkan teks jika ada
+  if(data.teks && data.teks.trim() !== '') {
+    const textDiv=document.createElement("div");
+    textDiv.className="msg";
+    textDiv.textContent=data.teks;
+    msgDiv.appendChild(textDiv);
+  }
+  
+  if(data.edited){
+    const editedSpan=document.createElement("span");
+    editedSpan.className="edited";
+    editedSpan.textContent="(diedit)";
+    msgDiv.appendChild(editedSpan);
+  }
+  
+  const timeSpan=document.createElement("span");
+  timeSpan.className="timestamp";
+  timeSpan.textContent=formatTime(data.waktu);
+  msgDiv.appendChild(timeSpan);
+  
+  const menu=document.createElement("div");
+  menu.className="bubble-menu "+(isMe?"outside":"inside");
+  
+  menu.innerHTML=isMe
+    ? `<button title="Balas">↩</button>
+       <button title="Edit">✎</button>
+       <button title="Hapus">🗑</button>`
+    : `<button title="Balas">↩</button>`;
+
+  menu.children[0].onclick = () => {
+  const replyPreviewText = data.files && data.files.length > 0 
+    ? `[File: ${data.files.length} file]` 
+    : data.teks || '[File]';
+  
+  replyData = {
+    user: data.user,
+    text: replyPreviewText,
+    id: d.id
+  };
+  replyText.textContent = `${data.user}: ${replyPreviewText}`; // Perbaikan di sini
+  replyBar.style.display = "flex";
+  closeMenus();
+  input.focus();
+};
+
+  if(isMe){
+    menu.children[1].onclick=async()=>{
+      closeMenus();
+      const msgElement=msgDiv.querySelector(".msg");
+      if(!msgElement) return;
+      
+      const originalText=msgElement.textContent;
+      
+      msgElement.contentEditable=true;
+      msgElement.focus();
+      
+      const range=document.createRange();
+      range.selectNodeContents(msgElement);
+      const sel=window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      
+      msgElement.onkeydown=async e=>{
+        if(e.key==="Enter" && !e.shiftKey){
+          e.preventDefault();
+          msgElement.contentEditable=false;
+          const newText=msgElement.textContent.trim();
+          if(newText && newText!==originalText){
+            await updateDoc(doc(db,"pesan",d.id),{
+              teks:newText,
+              edited:true
+            });
+          }
+        }
+        if(e.key==="Escape"){
+          msgElement.contentEditable=false;
+          msgElement.textContent=originalText;
+        }
+      };
+      
+      msgElement.onblur=async()=>{
+        msgElement.contentEditable=false;
+        const newText=msgElement.textContent.trim();
+        if(newText && newText!==originalText){
+          await updateDoc(doc(db,"pesan",d.id),{
+            teks:newText,
+            edited:true
+          });
+        }
+      };
+    };
+
+    menu.children[2].onclick=async()=>{
+      closeMenus();
+      if(confirm("Hapus pesan ini?")){
+        // Hapus file dari Supabase jika ada
+        if(data.files && data.files.length > 0) {
+          try {
+            const filesToDelete = data.files.map(file => file.path);
+            const { error } = await supabase.storage
+              .from('chat-storage')
+              .remove(filesToDelete);
+            
+            if (error) {
+              console.error("Error deleting files:", error);
+            }
+          } catch (error) {
+            console.error("Error cleaning up files:", error);
+          }
+        }
+        
+        await deleteDoc(doc(db,"pesan",d.id));
+      }
+    };
+  }
+
+  msgDiv.appendChild(menu);
+
+  msgDiv.oncontextmenu=e=>{
+    e.preventDefault();
+    closeMenus();
+    if(isMe) msgDiv.classList.add("shift-left");
+    menu.style.display="flex";
+  };
+
+  chatBox.appendChild(msgDiv);
+}
+
+/* SCROLL TO MESSAGE */
+function scrollToMessage(id){
+  let attempts=0;
+  const interval = setInterval(()=>{
+    const target = document.getElementById("msg-"+id);
+    if(target || attempts>10){
+      clearInterval(interval);
+      if(target){
+        target.scrollIntoView({behavior:"smooth", block:"center"});
+        target.classList.add("highlight");
+        setTimeout(()=> target.classList.remove("highlight"),1200);
+      }
+    }
+    attempts++;
+  },50);
+}
+
+/* PREVIEW MODAL */
+window.showPreview = (url, type) => {
+  previewContent.innerHTML = '';
+  
+  if(type === 'image') {
+    const img = document.createElement('img');
+    img.src = url;
+    previewContent.appendChild(img);
+  } else if(type === 'video') {
+    const video = document.createElement('video');
+    video.src = url;
+    video.controls = true;
+    video.autoplay = true;
+    previewContent.appendChild(video);
+  }
+  
+  previewModal.style.display = 'flex';
+};
+
+window.closePreview = () => {
+  previewModal.style.display = 'none';
+};
+
+/* CLOSE ALL MENUS */
+function closeMenus(){
+  document.querySelectorAll(".bubble-menu").forEach(m=>{
+    m.style.display="none";
+    m.parentElement.classList.remove("shift-left");
+  });
+}
+document.addEventListener("click",closeMenus);
+
+/* AUTO-RESIZE TEXTAREA */
+input.addEventListener("input",function(){
+  autoResizeTextarea(this);
+});
+
+/* KIRIM PESAN */
+window.kirim = async () => {
+  if (isSending) return;
+  
+  const text = input.value.trim();
+  const hasFiles = filesToUpload.length > 0;
+  
+  if (!text && !hasFiles) return;
+  
+  // 1. SIMPAN DATA SEBELUM DIHAPUS
+  const messageText = text;
+  const currentReply = replyData;
+  const currentFiles = [...filesToUpload];
+  
+  // 2. INSTANT CLEAR UI
+  input.value = "";
+  replyData = null;
+  replyBar.style.display = "none";
+  filesToUpload = [];
+  uploadPreview.style.display = "none";
+  uploadPreview.innerHTML = "";
+  
+  // 3. INSTANT RESET UI
+  input.style.height = "auto";
+  isSending = true;
+  updateSend();
+  
+  // 4. Tampilkan loading state
+  const originalHTML = sendBtn.innerHTML;
+  sendBtn.innerHTML = '<span style="font-size:14px">⌛</span>';
+  sendBtn.disabled = true;
+  
+  try {
+    let uploadedFiles = [];
+    
+    // 5. Upload file ke Supabase jika ada
+    if (hasFiles) {
+      for (const file of currentFiles) {
+        try {
+          const fileData = await uploadToSupabase(file);
+          uploadedFiles.push(fileData);
+        } catch (error) {
+          console.error("Upload error:", error);
+          // Jika satu file gagal, lanjutkan dengan file lainnya
+        }
+      }
+    }
+    
+    // 6. Simpan pesan ke Firestore
+    const messageData = {
+      user: username,
+      waktu: serverTimestamp(),
+      edited: false
+    };
+    
+    if (messageText) {
+      messageData.teks = sanitize(messageText);
+    }
+    
+    if (currentReply) {
+      messageData.reply = currentReply;
+    }
+    
+    if (uploadedFiles.length > 0) {
+      messageData.files = uploadedFiles;
+    }
+    
+    await addDoc(collection(db, "pesan"), messageData);
+    
+    // 7. Scroll ke bawah
+    setTimeout(() => {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }, 100);
+    
+  } catch (error) {
+    console.error("Send error:", error);
+    alert("Gagal mengirim pesan. Silakan coba lagi.");
+    
+    // Kembalikan data jika gagal
+    input.value = messageText;
+    if (currentReply) {
+      replyData = currentReply;
+      replyText.textContent = `${currentReply.user}: ${currentReply.text}`;
+      replyBar.style.display = "flex";
+    }
+    filesToUpload = currentFiles;
+    if (filesToUpload.length > 0) {
+      showUploadPreview();
+    }
+    
+  } finally {
+    // 8. Reset state
+    isSending = false;
+    sendBtn.innerHTML = originalHTML;
+    updateSend();
+    
+    // 9. Fokus kembali ke input
+    setTimeout(() => {
+      input.focus();
+    }, 50);
+  }
+};
+
+/* ENTER TO SEND */
+input.addEventListener("keydown", e => {
+  if (e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+    kirim();
+  }
+});
+
+/* CANCEL REPLY */
+window.cancelReply = () => {
+  replyData = null;
+  replyBar.style.display = "none";
+  input.focus();
+};
+
+/* LOGOUT */
+window.logout = async () => {
+  if (confirm("Apakah Anda yakin ingin logout?")) {
+    try {
+      logoutBtn.disabled = true;
+      logoutBtn.innerHTML = "⌛";
+      await signOut(auth);
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert("Gagal logout. Silakan coba lagi.");
+      logoutBtn.disabled = false;
+      logoutBtn.innerHTML = "⎋";
+    }
+  }
+};
+
+// Inisialisasi
+updateSend();
+
+// FOKUS INPUT ON LOAD
+setTimeout(() => {
+  if (input) {
+    input.focus();
+    
+    // Event listener untuk paste (clear formatting)
+    input.addEventListener('paste', function(e) {
+      e.preventDefault();
+      const text = e.clipboardData.getData('text/plain');
+      document.execCommand('insertText', false, text);
+    });
+  }
+}, 300);
+</script>
+
+</body>
+</html>
