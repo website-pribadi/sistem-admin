@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<title>WebChat</title><link rel="icon" type="image/png" href="chat.png">
+<title>WebChat</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
@@ -99,6 +99,71 @@ html,body{height:100%;font-family:Arial;background:#ece5dd}
   font-weight:bold;
   color:#555;
   margin-bottom:4px;
+}
+
+/* BUBBLE STATUS LOGIN (DI BAWAH PESAN) */
+.status-pesan {
+  position: relative;
+  max-width: 27%;
+  padding: 6px 12px;
+  margin: 4px auto 8px auto;
+  border-radius: 15px;
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: center;
+  clear: both;
+  word-wrap: break-word;
+  animation: fadeInUp 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+}
+
+/* WARNA UNTUK STATUS LOGIN */
+.status-pesan.login {
+  background: rgba(227, 242, 253, 0.9);
+  border: 1px solid #90caf9;
+  color: #1565c0;
+}
+
+.status-pesan.logout {
+  background: rgba(245, 245, 245, 0.9);
+  border: 1px solid #e0e0e0;
+  color: #616161;
+}
+
+.status-pesan .user-name {
+  font-weight: bold;
+  font-size: 11px;
+  margin-right: 4px;
+}
+
+.status-pesan .status-text {
+  font-style: italic;
+  font-size: 11px;
+  margin-right: 6px;
+}
+
+.status-pesan .timestamp {
+  font-size: 10px;
+  color: rgba(0,0,0,0.6);
+  font-style: normal;
+  display: inline-block;
+  margin-left: 4px;
+  padding-left: 6px;
+  border-left: 1px solid rgba(0,0,0,0.2);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* FILE CONTAINER */
@@ -303,7 +368,7 @@ html,body{height:100%;font-family:Arial;background:#ece5dd}
   min-height:44px;
   resize:none;
   font-family:inherit;
-  order: 1; /* Tambahkan ini */
+  order: 1;
 }
 #input:focus{
   border-color:#128c7e;
@@ -324,7 +389,7 @@ html,body{height:100%;font-family:Arial;background:#ece5dd}
   justify-content:center;
   transition:all .15s ease;
   flex-shrink:0;
-  order: 3; /* Ubah menjadi 3 */
+  order: 3;
 }
 #fileBtn:hover{
   background:#555;
@@ -345,7 +410,7 @@ html,body{height:100%;font-family:Arial;background:#ece5dd}
   justify-content:center;
   transition:all .15s ease;
   flex-shrink:0;
-  order: 4; /* Ubah menjadi 4 */
+  order: 4;
 }
 #sendBtn:hover{
   background:#075e54;
@@ -509,16 +574,16 @@ import { getAuth, onAuthStateChanged, signOut }
 from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 import {
   getFirestore, collection, addDoc, query, orderBy,
-  onSnapshot, doc, getDoc, updateDoc, deleteDoc, serverTimestamp
+  onSnapshot, doc, getDoc, updateDoc, deleteDoc, serverTimestamp,
+  writeBatch, getDocs, where
 } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
 // Import Supabase client
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 /* KONFIGURASI SUPABASE */
-// GANTI dengan konfigurasi Supabase Anda
-const supabaseUrl = 'https://jlihaulpdflnccgcjaud.supabase.co' // Ganti dengan URL Supabase Anda
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpsaWhhdWxwZGZsbmNjZ2NqYXVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxMjY2MDYsImV4cCI6MjA4MTcwMjYwNn0.vncAguYh88c1ZiI_c1-YsqL4aEXw2NdLpnwKJs3Z-7g' // Ganti dengan anon key Anda
+const supabaseUrl = 'https://jlihaulpdflnccgcjaud.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpsaWhhdWxwZGZsbmNjZ2NqYXVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYxMjY2MDYsImV4cCI6MjA4MTcwMjYwNn0.vncAguYh88c1ZiI_c1-YsqL4aEXw2NdLpnwKJs3Z-7g'
 const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 /* FIREBASE (untuk auth dan chat saja) */
@@ -591,6 +656,197 @@ function updateSend(){
   }
 }
 
+/* FUNGSI UNTUK MEMBUAT BUBBLE LOGIN */
+function createLoginBubble(user, type = 'login', timestamp = null) {
+  // Pastikan now selalu Date object
+  const now = (timestamp && (timestamp instanceof Date || (timestamp.toDate && typeof timestamp.toDate === 'function'))) 
+    ? (timestamp instanceof Date ? timestamp : timestamp.toDate())
+    : new Date();
+  
+  const messageId = `login-${user.replace(/\s+/g, '-')}`;
+  
+  // Cek apakah bubble untuk user ini sudah ada
+  const existingBubble = document.getElementById(messageId);
+  if (existingBubble) {
+    // Update bubble yang ada
+    existingBubble.dataset.type = type;
+    existingBubble.dataset.timestamp = now.getTime();
+    
+    const timeText = formatTime(now);
+    const statusText = type === 'login' ? 'telah login' : 'telah logout';
+    
+    existingBubble.innerHTML = `
+      <span class="user-name">${user}</span>
+      <span class="status-text">${statusText}</span>
+      <span class="timestamp">${timeText}</span>
+    `;
+    
+    // Update class untuk warna yang sesuai
+    existingBubble.className = `status-pesan ${type}`;
+    
+    // Tambahkan animasi update
+    existingBubble.style.animation = 'none';
+    setTimeout(() => {
+      existingBubble.style.animation = 'fadeInUp 0.3s ease';
+    }, 10);
+    
+    return existingBubble;
+  }
+  
+  // Buat bubble baru
+  const bubble = document.createElement("div");
+  bubble.className = `status-pesan ${type}`;
+  bubble.id = messageId;
+  bubble.dataset.user = user;
+  bubble.dataset.type = type;
+  bubble.dataset.timestamp = now.getTime();
+  
+  const timeText = formatTime(now);
+  const statusText = type === 'login' ? 'telah login' : 'telah logout';
+  
+  const content = `
+    <span class="user-name">${user}</span>
+    <span class="status-text">${statusText}</span>
+    <span class="timestamp">${timeText}</span>
+  `;
+  
+  bubble.innerHTML = content;
+  
+  return bubble;
+}
+
+/* FUNGSI UNTUK MENYIMPAN LOGIN KE FIRESTORE */
+async function saveLoginToFirestore(type = 'login') {
+  try {
+    if (!username || username === "Anonim") return;
+    
+    // Hapus login lama untuk user ini
+    const loginsRef = collection(db, "logins");
+    const q = query(loginsRef, where("user", "==", username));
+    
+    const querySnapshot = await getDocs(q);
+    const batch = writeBatch(db);
+    
+    querySnapshot.forEach((docSnap) => {
+      batch.delete(docSnap.ref);
+    });
+    
+    // Simpan login baru
+    const loginData = {
+      user: username,
+      type: type,
+      waktu: serverTimestamp()
+    };
+    
+    const newLoginRef = doc(collection(db, "logins"));
+    batch.set(newLoginRef, loginData);
+    
+    await batch.commit();
+    console.log(`${type} berhasil disimpan untuk ${username}`);
+    
+  } catch (error) {
+    console.error(`Error menyimpan ${type}:`, error);
+  }
+}
+
+/* FUNGSI UNTUK MENAMPILKAN LOGIN DARI FIRESTORE */
+function renderLoginMessage(doc) {
+  const data = doc.data();
+  const isMe = data.user === username;
+  
+  // Hanya tampilkan login/logout dari pengguna lain
+  if (isMe) return;
+  
+  const bubble = createLoginBubble(data.user, data.type, data.waktu);
+  
+  if (!bubble) return;
+  
+  // Cari semua pesan di chat box
+  const allMessages = Array.from(chatBox.children);
+  
+  // Cari indeks bubble login yang sudah ada (jika ada)
+  const existingBubbleIndex = allMessages.findIndex(child => 
+    child.id === bubble.id
+  );
+  
+  if (existingBubbleIndex !== -1) {
+    // Hapus bubble lama
+    allMessages[existingBubbleIndex].remove();
+  }
+  
+  // Cari semua bubble login yang ada
+  const existingLoginBubbles = chatBox.querySelectorAll('.status-pesan');
+  
+  // Batasi jumlah bubble status maksimal 5
+  if (existingLoginBubbles.length >= 5) {
+    // Hapus bubble tertua (dengan timestamp terkecil)
+    let oldestBubble = null;
+    let oldestTime = Infinity;
+    
+    existingLoginBubbles.forEach(bubble => {
+      const timestamp = parseInt(bubble.dataset.timestamp);
+      if (timestamp < oldestTime) {
+        oldestTime = timestamp;
+        oldestBubble = bubble;
+      }
+    });
+    
+    if (oldestBubble) {
+      oldestBubble.remove();
+    }
+  }
+  
+  // Tempatkan bubble di bawah pesan terakhir
+  const lastMessage = chatBox.querySelector('.pesan:last-child');
+  
+  if (lastMessage) {
+    // Sisipkan bubble setelah pesan terakhir
+    chatBox.insertBefore(bubble, lastMessage.nextSibling);
+  } else {
+    // Jika tidak ada pesan, tambahkan di akhir
+    chatBox.appendChild(bubble);
+  }
+}
+
+/* LISTENER UNTUK LOGIN/LOGOUT */
+function listenLogins() {
+  const q = query(collection(db, "logins"), orderBy("waktu", "desc"));
+  
+  onSnapshot(q, (snapshot) => {
+    // Kosongkan dulu semua bubble status
+    const existingBubbles = chatBox.querySelectorAll('.status-pesan');
+    existingBubbles.forEach(bubble => {
+      bubble.remove();
+    });
+    
+    // Simpan status terbaru per user
+    const userStatusMap = new Map();
+    
+    // Ambil hanya status terbaru untuk setiap user
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const user = data.user;
+      
+      // Hanya simpan status terbaru untuk setiap user
+      if (!userStatusMap.has(user) && user !== username) {
+        userStatusMap.set(user, { data, doc });
+      }
+    });
+    
+    // Render status terbaru untuk setiap user (maksimal 5 user)
+    let count = 0;
+    userStatusMap.forEach((value, user) => {
+      if (count < 5) {
+        renderLoginMessage(value.doc);
+        count++;
+      }
+    });
+    
+  }, (error) => {
+    console.error("Error listening to logins:", error);
+  });
+}
+
 /* FILE UPLOAD FUNCTIONS */
 fileBtn.onclick = () => {
   fileInput.click();
@@ -606,13 +862,11 @@ fileInput.onchange = (e) => {
       return;
     }
     
-    // Validasi ukuran file (maks 50MB untuk Supabase free tier)
     if(file.size > 50 * 1024 * 1024) {
       alert(`File ${file.name} terlalu besar (maks 50MB)`);
       return;
     }
     
-    // Validasi tipe file
     const allowedTypes = [
       'image/jpeg', 'image/png', 'image/gif', 'image/webp',
       'video/mp4', 'video/mpeg', 'video/webm',
@@ -671,21 +925,18 @@ window.removeFile = (index) => {
 
 async function uploadToSupabase(file) {
   try {
-    // Buat nama file unik dengan timestamp
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2)}.${fileExt}`;
     const filePath = `chat-files/${fileName}`;
     
-    // Upload ke Supabase Storage
     const { data, error } = await supabase.storage
-      .from('chat-storage') // Nama bucket di Supabase Storage
+      .from('chat-storage')
       .upload(filePath, file);
     
     if (error) {
       throw error;
     }
     
-    // Dapatkan URL publik
     const { data: urlData } = supabase.storage
       .from('chat-storage')
       .getPublicUrl(filePath);
@@ -717,7 +968,14 @@ onAuthStateChanged(auth,async user=>{
     const snap=await getDoc(doc(db,"usernames",user.uid));
     username=snap.exists()?snap.data().username:"Anonim";
     document.getElementById("user-info").textContent=`${username}`;
+    
+    // Simpan login ke Firestore
+    await saveLoginToFirestore('login');
+    
+    // Mulai listen untuk chat dan login
     listenChat();
+    listenLogins();
+    
   }catch(error){
     console.error("Auth error:", error);
   }
@@ -731,21 +989,38 @@ function listenChat(){
     const loadingEl = chatBox.querySelector('.loading');
     if(loadingEl) loadingEl.remove();
     
-    chatBox.innerHTML="";
+    // Hapus hanya pesan chat, jangan hapus bubble login
+    const chatMessages = chatBox.querySelectorAll('.pesan, .loading, .empty-state');
+    chatMessages.forEach(msg => {
+      msg.remove();
+    });
     
     if(s.empty){
-      chatBox.innerHTML=`
-        <div class="empty-state">
-          <div class="empty-state-icon">💬</div>
-          <h3>Belum ada percakapan</h3>
-          <p>Mulai percakapan dengan mengirim pesan pertama!</p>
-        </div>
+      const emptyState = document.createElement("div");
+      emptyState.className = "empty-state";
+      emptyState.innerHTML = `
+        <div class="empty-state-icon">💬</div>
+        <h3>Belum ada percakapan</h3>
+        <p>Mulai percakapan dengan mengirim pesan pertama!</p>
       `;
+      
+      // Tambahkan di akhir chat box
+      chatBox.appendChild(emptyState);
+      
+      // Bubble login akan tetap tampil di atas empty state
       return;
     }
     
+    // Render semua pesan chat
     s.forEach(d=>renderMessage(d));
-    chatBox.scrollTop=chatBox.scrollHeight;
+    
+    // Bubble login akan tetap di bawah pesan terakhir
+    // karena sudah ditempatkan di renderLoginMessage
+    
+    // Scroll ke bawah
+    setTimeout(() => {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }, 100);
   }, error => {
     console.error("Chat error:", error);
   });
@@ -759,6 +1034,7 @@ function renderMessage(d){
   const msgDiv=document.createElement("div");
   msgDiv.className="pesan "+(isMe?"saya":"lawan");
   msgDiv.id="msg-"+d.id;
+  msgDiv.dataset.timestamp = data.waktu?.toDate ? data.waktu.toDate().getTime() : Date.now();
   
   let htmlContent = `<small>${sanitize(data.user)}</small>`;
   
@@ -770,7 +1046,6 @@ function renderMessage(d){
     msgDiv.appendChild(replyPreview);
   }
   
-  // Tampilkan file jika ada
   if(data.files && data.files.length > 0) {
     const fileContainer = document.createElement("div");
     fileContainer.className = "file-container";
@@ -813,7 +1088,6 @@ function renderMessage(d){
     msgDiv.appendChild(fileContainer);
   }
   
-  // Tampilkan teks jika ada
   if(data.teks && data.teks.trim() !== '') {
     const textDiv=document.createElement("div");
     textDiv.className="msg";
@@ -852,7 +1126,7 @@ function renderMessage(d){
     text: replyPreviewText,
     id: d.id
   };
-  replyText.textContent = `${data.user}: ${replyPreviewText}`; // Perbaikan di sini
+  replyText.textContent = `${data.user}: ${replyPreviewText}`;
   replyBar.style.display = "flex";
   closeMenus();
   input.focus();
@@ -908,7 +1182,6 @@ function renderMessage(d){
     menu.children[2].onclick=async()=>{
       closeMenus();
       if(confirm("Hapus pesan ini?")){
-        // Hapus file dari Supabase jika ada
         if(data.files && data.files.length > 0) {
           try {
             const filesToDelete = data.files.map(file => file.path);
@@ -938,6 +1211,7 @@ function renderMessage(d){
     menu.style.display="flex";
   };
 
+  // Tambahkan pesan ke chat box
   chatBox.appendChild(msgDiv);
 }
 
@@ -1038,7 +1312,6 @@ window.kirim = async () => {
           uploadedFiles.push(fileData);
         } catch (error) {
           console.error("Upload error:", error);
-          // Jika satu file gagal, lanjutkan dengan file lainnya
         }
       }
     }
@@ -1119,7 +1392,14 @@ window.logout = async () => {
     try {
       logoutBtn.disabled = true;
       logoutBtn.innerHTML = "⌛";
-      await signOut(auth);
+      
+      // Simpan logout ke Firestore
+      await saveLoginToFirestore('logout');
+      
+      setTimeout(async () => {
+        await signOut(auth);
+      }, 1000);
+      
     } catch (error) {
       console.error("Logout error:", error);
       alert("Gagal logout. Silakan coba lagi.");
@@ -1137,7 +1417,6 @@ setTimeout(() => {
   if (input) {
     input.focus();
     
-    // Event listener untuk paste (clear formatting)
     input.addEventListener('paste', function(e) {
       e.preventDefault();
       const text = e.clipboardData.getData('text/plain');
