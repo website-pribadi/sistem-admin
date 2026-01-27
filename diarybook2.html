@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diary Book</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Montserrat:wght@300;400;600&family=Dancing+Script:wght@500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --text-color: #f1f5f9;
+            --accent-gold: #fbbf24;
+            --accent-glow: rgba(251, 191, 36, 0.3);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --page-bg: #ffffff;
+            --book-shadow: rgba(0, 0, 0, 0.8);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --accent-gold: #b45309;
+            --accent-glow: rgba(180, 83, 9, 0.1);
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --page-bg: #fffcf5;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; margin: 0; overflow: hidden;
+        }
+
+        /* --- STYLE FAB GROUP (GABUNGAN TOMBOL) --- */
+        .fab-group {
+            position: fixed; bottom: 40px; right: 40px;
+            display: flex; flex-direction: column-reverse;
+            align-items: center; gap: 15px; z-index: 2000;
+        }
+
+        .fab-main {
+            width: 65px; height: 65px; border-radius: 50%;
+            background: var(--accent-gold); color: #fff;
+            border: none; cursor: pointer; font-size: 1.8rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .fab-group.active .fab-main { transform: rotate(45deg); }
+
+        .fab-options {
+            display: flex; flex-direction: column; gap: 12px;
+            opacity: 0; pointer-events: none;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .fab-group.active .fab-options {
+            opacity: 1; pointer-events: auto;
+            transform: translateY(0);
+        }
+
+        .fab-sub {
+            width: 50px; height: 50px; border-radius: 50%;
+            background: var(--card-bg); color: var(--accent-gold);
+            border: 1px solid var(--accent-gold); cursor: pointer;
+            backdrop-filter: blur(10px); font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: transform 0.2s ease;
+        }
+
+        .fab-sub:hover { transform: scale(1.1); }
+
+        /* --- AREA BUKU --- */
+        .book-container { perspective: 2500px; }
+        .book { 
+            width: 400px; height: 550px; position: relative; 
+            transform-style: preserve-3d; 
+            transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1); 
+        }
+        .book.open { transform: translateX(200px); }
+
+        .page {
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+            transform-origin: left; transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+            cursor: pointer; border-radius: 2px 20px 20px 2px; overflow: hidden;
+        }
+
+        .page-paper {
+            background: var(--page-bg); height: 100%; padding: 40px;
+            display: flex; flex-direction: column;
+            box-shadow: inset 5px 0 20px rgba(0,0,0,0.1);
+            background-image: radial-gradient(#d1d1d1 0.5px, transparent 0.5px);
+            background-size: 20px 20px;
+            box-sizing: border-box;
+        }
+
+        .page.cover { border: 2px solid #334155; background: linear-gradient(145deg, #1e293b, #000); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
+        .page.cover h1 { font-family: 'Cinzel', serif; color: var(--accent-gold); letter-spacing: 4px; }        .cover-inner-border { border: 2px solid var(--accent-gold); padding: 40px 20px; text-align: center; width: 280px; height: 400px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-sizing: border-box; }  
+        .page.flipped { transform: rotateY(-180deg); }
+
+        /* --- STYLING DAFTAR ISI --- */
+        .toc-title { text-align: center; font-family: 'Cinzel', serif; font-size: 1.2rem; border-bottom: 2px solid var(--accent-gold); margin-bottom: 15px; color: #1e293b; }
+        .toc-scroll-area { flex-grow: 1; overflow-y: auto; padding-right: 5px; margin-bottom: 10px; }
+        .toc-list { list-style: none; padding: 0; margin: 0; font-family: 'Dancing Script', cursive; }
+        .toc-item { display: flex; justify-content: space-between; padding: 5px 5px; border-bottom: 1px solid rgba(0,0,0,0.05); cursor: pointer; font-size: 1.1rem; color: #334155; }
+        .toc-item:hover { background: rgba(251, 191, 36, 0.1); }
+        .toc-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
+
+        .action-bar { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--accent-gold); padding-bottom: 10px; margin-bottom: 15px; }
+        .author-info { display: flex; flex-direction: column; gap: 4px; }
+        .author-name { font-family: 'Cinzel', serif; font-weight: 700; color: #1e293b; font-size: 0.8rem; display: flex; align-items: center; gap: 8px; }
+        .timestamp { font-size: 0.6rem; color: #64748b; font-style: italic; }
+        .action-btns { display: flex; gap: 15px; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 0.75rem; padding: 2px;}
+        .icon-btn.edit { color: #60a5fa; }
+        .icon-btn.delete { color: #f87171; }
+
+        .journal-body {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.1rem;
+            line-height: 1.1;
+            color: #334155;
+            flex-grow: 1;
+            overflow-y: auto; 
+            white-space: pre-wrap; 
+            word-wrap: break-word;
+            padding-right: 5px;            letter-spacing: 0px
+        }
+
+        .journal-body::-webkit-scrollbar, .toc-scroll-area::-webkit-scrollbar { width: 2px; }
+        .journal-body::-webkit-scrollbar-thumb, .toc-scroll-area::-webkit-scrollbar-thumb { background: #cacaca; border-radius: 10px; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(10px); display: none; justify-content: center; align-items: center; z-index: 3000; }
+        .modal-overlay.active { display: flex; }
+        .modal-content { background: var(--card-bg); padding: 40px; border-radius: 30px; width: 90%; max-width: 500px; border: 1px solid rgba(255,255,255,0.1); }
+        input, textarea { width: 100%; background: rgba(15, 23, 42, 0.5); border: 1px solid #334155; border-radius: 15px; padding: 15px; color: white; margin-bottom: 15px; box-sizing: border-box; }
+        .btn-save { background: var(--accent-gold); color: #000; font-weight: 700; border: none; padding: 15px; border-radius: 15px; cursor: pointer; width: 100%; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+    <div class="fab-group" id="fabGroup">
+        <button class="fab-main" onclick="toggleFabMenu()">
+            <i class="fas fa-plus"></i>
+        </button>
+        <div class="fab-options">
+	    <button class="fab-sub" onclick="logout()" title="Keluar" style="color: #f87171; border-color: #f87171;">
+        	<i class="fas fa-sign-out-alt"></i>
+   	    </button>
+            <button class="fab-sub" onclick="toggleTheme()" id="themeBtn" title="Ubah Tema">
+                <i class="fas fa-sun"></i>
+            </button>
+            <button class="fab-sub" onclick="openModal()" title="Tulis Memoar">
+                <i class="fas fa-feather-alt"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <h2 id="modalTitle" style="font-family: 'Cinzel'; color: var(--accent-gold); margin-top:0;">Tulis Memoar</h2>
+            <input type="text" id="nameInput" placeholder="Nama Penulis..." oninput="handleInput(this, 'name')">
+            <textarea id="noteInput" rows="6" placeholder="Tulis Catatan Disini..." oninput="handleInput(this, 'text')"></textarea>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-save" onclick="saveNote()">Simpan</button>
+                <button onclick="closeModal()" style="background:transparent; color:#94a3b8; border:none; cursor:pointer;">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="book-container">
+        <div id="book" class="book">
+            <div class="page cover" id="front-cover" onclick="flipPage(this)">
+                <div class="cover-inner-border">
+                    <i class="fas fa-crown" style="color: var(--accent-gold); font-size: 2rem; margin-bottom: 20px;"></i>
+                    <h1>BEAUTIFUL MEMORIES</h1>
+                    <p style="color: #94a3b8; font-size: 0.8rem;">EST. 2025</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAyZSWCJq5fOghx8uU4Z0B8tTIi_TyyXgg",
+    authDomain: "jurnal-3d.firebaseapp.com",
+    projectId: "jurnal-3d",
+    storageBucket: "jurnal-3d.firebasestorage.app",
+    messagingSenderId: "616920448909",
+    appId: "1:616920448909:web:5cecf2f4098e7624c547c4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const notesCol = collection(db, "notes");
+
+  const bookEl = document.getElementById('book');
+  const modal = document.getElementById('modalOverlay');
+  const fabGroup = document.getElementById('fabGroup');
+  let editingId = null;
+
+  // --- FUNGSI TOGGLE MENU FAB ---
+  window.toggleFabMenu = () => {
+      fabGroup.classList.toggle('active');
+  };
+
+  window.openModal = () => { 
+      editingId = null; 
+      document.getElementById('nameInput').value = ""; 
+      document.getElementById('noteInput').value = ""; 
+      document.getElementById('modalTitle').innerText = "Tulis Memoar"; 
+      modal.classList.add('active'); 
+      fabGroup.classList.remove('active'); // Tutup menu setelah buka modal
+  };
+  
+  window.closeModal = () => modal.classList.remove('active');
+
+  window.toggleTheme = () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const target = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', target);
+      document.getElementById('themeBtn').innerHTML = target === 'light' ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+      fabGroup.classList.remove('active'); // Tutup menu setelah ganti tema
+  };
+ window.handleInput = (el, type) => {
+    let cursorPosition = el.selectionStart; // Simpan posisi kursor agar tidak melompat ke akhir
+    let val = el.value;
+
+    if (type === 'name') {
+        // Kapital setiap awal kata untuk Nama
+        el.value = val.replace(/\b\w/g, (l) => l.toUpperCase());
+    } 
+    
+    else if (type === 'text') {
+        // 1. Jadikan huruf besar di awal teks (awal paragraf)
+        let formatted = val.charAt(0).toUpperCase() + val.slice(1);
+        
+        // 2. Kapital setelah titik (.), tanda tanya (?), atau tanda seru (!) yang diikuti spasi
+        formatted = formatted.replace(/([.!?]\s+)(\w)/g, (match, p1, p2) => {
+            return p1 + p2.toUpperCase();
+        });
+
+        el.value = formatted;
+    }
+
+    // Kembalikan posisi kursor agar user nyaman mengetik
+    el.setSelectionRange(cursorPosition, cursorPosition);
+};
+window.logout = () => {
+    if (confirm("Apakah Anda yakin ingin keluar?")) {
+        // Menghapus data sesi login
+        sessionStorage.removeItem('fileExplorerLoggedIn');
+        sessionStorage.removeItem('loginTime');
+        
+        // Redirect ke halaman index
+        window.location.href = 'index.html';
+    }
+};
+window.saveNote = async () => {
+    let namaRaw = document.getElementById('nameInput').value.trim() || "Misterius";
+    let isiRaw = document.getElementById('noteInput').value.trim();
+
+    if (!isiRaw) {
+        alert("Catatan tidak boleh kosong!");
+        return;
+    }
+
+    // --- LOGIKA FORMALISASI TEKS (Kapitalisasi Otomatis) ---
+
+    // 1. Rapikan Nama: Setiap awal kata jadi Huruf Kapital (Budi Sudarsono)
+    const namaFix = namaRaw.toLowerCase().replace(/\b\w/g, (l) => l.toUpperCase());
+
+    // 2. Rapikan Isi: Huruf kapital hanya di awal kalimat & setelah tanda titik/tanya/seru
+    // Langkah: Kecilkan semua -> Kapital di awal teks -> Kapital setelah tanda baca . ! ?
+    let isiFix = isiRaw.toLowerCase()
+        .replace(/(^\s*\w|[.!?]\s+\w)/g, (match) => match.toUpperCase()) // Kapital awal kalimat
+        .replace(/\s+/g, ' '); // Menghapus spasi ganda yang tidak sengaja
+
+    // Kapital untuk huruf pertama jika user tidak memberi spasi setelah titik
+    isiFix = isiFix.charAt(0).toUpperCase() + isiFix.slice(1);
+
+    // --- PROSES SIMPAN KE FIREBASE ---
+
+    const now = new Date();
+    const formatLengkap = now.toLocaleDateString('id-ID', { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'short', 
+        year: 'numeric' 
+    }) + ", " + now.toLocaleTimeString('id-ID', { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+    }).replace('.', ':');
+
+    try {
+        if (editingId) {
+            // Jika sedang mode edit
+            await updateDoc(doc(db, "notes", editingId), { 
+                nama: namaFix, 
+                isi: isiFix, 
+                waktu: formatLengkap 
+            });
+        } else {
+            // Jika catatan baru
+            await addDoc(notesCol, { 
+                nama: namaFix, 
+                isi: isiFix, 
+                waktu: formatLengkap, 
+                createdAt: now 
+            });
+        }
+        window.closeModal();
+    } catch (e) { 
+        console.error("Error: ", e);
+        alert("Gagal menyimpan ke database!"); 
+    }
+};
+
+  window.deleteNote = async (id, e) => { e.stopPropagation(); if(confirm("Hapus memoar ini?")) await deleteDoc(doc(db, "notes", id)); };
+
+  window.editNote = (id, nama, isi, e) => {
+      e.stopPropagation(); editingId = id;
+      document.getElementById('nameInput').value = nama;
+      document.getElementById('noteInput').value = isi;
+      document.getElementById('modalTitle').innerText = "Edit Memoar";
+      modal.classList.add('active');
+  };
+
+  window.flipPage = (el) => { el.classList.toggle('flipped'); setTimeout(reorderZ, 500); };
+  
+  function reorderZ() { 
+      const pages = document.querySelectorAll('.page'); 
+      const frontCover = document.getElementById('front-cover');
+      if (frontCover.classList.contains('flipped')) {
+          bookEl.classList.add('open');
+      } else {
+          bookEl.classList.remove('open');
+      }
+      pages.forEach((p, i) => { p.style.zIndex = p.classList.contains('flipped') ? i : pages.length - i; }); 
+  }
+
+  window.jumpToPage = (noteIndex, e) => {
+      e.stopPropagation(); 
+      const targetDomIndex = noteIndex + 2; 
+      const allPages = document.querySelectorAll('.page');
+      allPages.forEach((page, domIndex) => {
+          if (domIndex < targetDomIndex) page.classList.add('flipped');
+          else page.classList.remove('flipped');
+      });
+      setTimeout(reorderZ, 50);
+  };
+
+  const q = query(notesCol, orderBy("createdAt", "asc"));
+  onSnapshot(q, (snapshot) => {
+      document.querySelectorAll('.page:not(#front-cover)').forEach(p => p.remove());
+      const saved = [];
+      snapshot.forEach((docSnap) => {
+          saved.push({ id: docSnap.id, ...docSnap.data() });
+      });
+
+      // Render Daftar Isi
+      const tocPage = document.createElement('div');
+      tocPage.className = 'page';
+      let tocHTML = `<div class="page-paper"><h3 class="toc-title">Daftar Isi</h3><div class="toc-scroll-area">`;
+      if(saved.length === 0) {
+          tocHTML += `<p style="text-align:center; opacity:0.6; font-family:'Dancing Script'; margin-top:20px;">Belum ada catatan.</p>`;
+      } else {
+          tocHTML += `<ul class="toc-list">`;
+          saved.forEach((item, i) => {
+              const snippet = item.isi.length > 25 ? item.isi.substring(0, 25) + '...' : item.isi;
+              tocHTML += `<li class="toc-item" onclick="window.jumpToPage(${i}, event)"><span class="toc-text">${snippet}</span><span>${i + 1}</span></li>`;
+          });
+          tocHTML += `</ul>`;
+      }
+      tocHTML += `</div><div style="font-size: 10px; color: #cbd5e1; border-top: 1px solid #eee; padding-top: 5px;">INDEX</div></div>`;
+      tocPage.innerHTML = tocHTML;
+      tocPage.onclick = function() { window.flipPage(this); };
+      bookEl.appendChild(tocPage);
+
+      // Render Catatan
+      saved.forEach((item, index) => {
+          const page = document.createElement('div');
+          page.className = 'page';
+          page.innerHTML = `
+              <div class="page-paper">
+                  <div class="action-bar">
+                      <div class="author-info">
+                          <span class="author-name"><i class="fas fa-user"></i> ${item.nama}</span>
+                          <span class="timestamp">${item.waktu || "Baru saja"}</span>
+                      </div>
+                      <div class="action-btns">
+                          <button class="icon-btn edit" onclick="window.editNote('${item.id}', '${item.nama}', \`${item.isi}\`, event)"><i class="fas fa-edit"></i></button>
+                          <button class="icon-btn delete" onclick="window.deleteNote('${item.id}', event)"><i class="fas fa-trash"></i></button>
+                      </div>
+                  </div>
+                  <div class="journal-body">${item.isi}</div>
+                  <div style="display:flex; margin-top:10px;">
+                      <span style="font-size: 10px; color: #cbd5e1; border-top: 1px solid #eee; width: 100%; padding-top: 5px;">HALAMAN ${index + 1}</span>
+                  </div>
+              </div>`;
+          page.onclick = function() { window.flipPage(this); };
+          bookEl.appendChild(page);
+      });(function checkAuth() {
+    // Cek session login
+    const isLoggedIn = sessionStorage.getItem('fileExplorerLoggedIn');
+    const loginTime = parseInt(sessionStorage.getItem('loginTime') || '0');
+    const currentTime = Date.now();
+    const sessionDuration = 8 * 60 * 60 * 1000; // 8 jam
+    
+    // Jika belum login atau session expired
+    if (!isLoggedIn || (currentTime - loginTime) > sessionDuration) {
+        // Clear session
+        sessionStorage.removeItem('fileExplorerLoggedIn');
+        sessionStorage.removeItem('loginTime');
+        
+        // Redirect ke index.html (bukan login.html)
+        window.location.href = 'index.html';
+        return;
+    }
+    
+    // Log aktivitas (opsional)
+    console.log('User authenticated');
+})();
+
+      const back = document.createElement('div');
+      back.className = 'page cover';
+      back.innerHTML = `<h2 style="font-family:'Cinzel'; color:var(--accent-gold)">THE END</h2>`;
+      back.onclick = function() { window.flipPage(this); };
+      bookEl.appendChild(back);
+      reorderZ();
+  });
+</script>
+</body>
+</html>
