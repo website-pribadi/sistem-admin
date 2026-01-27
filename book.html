@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Diary Book</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
+    <style>
+:root {
+    --bg-color: #e0e5ec;
+    --text-color: #3d2b1f; /* Cokelat gelap */
+    --modal-bg: #fdfbf0;   /* Warna kertas */
+    --input-bg: #ffffff;
+    --input-border: #d4c5a9;
+    --book-shadow: rgba(0,0,0,0.2);
+    
+    /* Warna Tombol Baru: Tema Kulit & Emas */
+    --fab-bg: #5d4037;     /* Brown Leather */
+    --fab-color: #f1c40f;  /* Gold */
+    --btn-toggle-bg: #8d6e63; 
+    --btn-toggle-color: #fff;
+    
+    --paper-base: #fdfbf0;
+    --paper-texture: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+    --ink-color: #1a3a5f;
+    --line-color: rgba(0, 0, 0, 0.05); 
+}
+
+[data-theme="dark"] {
+    --bg-color: #1a1a1a;
+    --text-color: #ecf0f1;
+    --modal-bg: #2c3e50;
+    --input-bg: #34495e;
+    --input-border: #4a6278;
+    --book-shadow: rgba(0,0,0,0.5);
+    
+    /* Dark Mode Buttons */
+    --fab-bg: #b8860b;     /* Dark Goldenrod */
+    --fab-color: #1a1a1a;
+    --btn-toggle-bg: #4a4a4a;
+    --btn-toggle-color: #f1c40f;
+    
+    --paper-base: #2c3e50;
+    --paper-texture: url('https://www.transparenttextures.com/patterns/asfalt-dark.png');
+    --ink-color: #ecf0f1; 
+    --line-color: rgba(255, 255, 255, 0.1);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0; padding: 0;
+    display: flex; flex-direction: column;
+    height: 100vh; overflow: hidden;
+    touch-action: none;
+    transition: background-color 0.5s ease;
+}
+
+/* --- FAB MENU SYSTEM --- */
+.fab-container {
+    position: fixed; 
+    bottom: 25px; 
+    right: 25px;
+    display: flex; /* Tetap flex agar struktur tombol tidak berantakan */
+    flex-direction: column-reverse;
+    align-items: center; 
+    gap: 15px; 
+    z-index: 5000;
+    
+    /* Efek muncul dari bawah */
+    opacity: 0;
+    transform: translateY(100px); /* Mulai dari posisi lebih bawah */
+    pointer-events: none; /* Agar tidak bisa diklik saat tidak terlihat */
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Class baru untuk memicu animasi */
+.fab-container.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.fab-main {
+    width: 60px; height: 60px; 
+    background-color: var(--fab-bg);
+    color: var(--fab-color); 
+    border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 24px; cursor: pointer; 
+    border: 2px solid var(--fab-color); /* Tambah border emas */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+    transition: transform 0.3s ease, background-color 0.3s;
+}
+
+.fab-container.active .fab-main { transform: rotate(135deg); background-color: #e74c3c; }
+
+.fab-sub {
+    width: 45px; height: 45px; background-color: var(--btn-toggle-bg);
+    color: var(--btn-toggle-color); border-radius: 50%;
+    display: flex; justify-content: center; align-items: center;
+    font-size: 18px; cursor: pointer; border: none;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    opacity: 0; transform: translateY(20px);
+    pointer-events: none; transition: all 0.3s ease;
+}
+
+.fab-container.active .fab-sub {
+    opacity: 1; transform: translateY(0); pointer-events: auto;
+}
+
+/* --- BUKU 3D --- */
+.book-container { 
+    perspective: 2500px; 
+    width: 100vw; height: 100vh;
+    display: flex; justify-content: center; align-items: center;
+}
+
+.book {
+    width: 100%; height: 100%; 
+    position: relative; 
+    transform-style: preserve-3d;
+}
+
+.page {
+    width: 100%; height: 100%;
+    background: 
+        linear-gradient(to right, rgba(0,0,0,0.15) 0%, transparent 5%, transparent 100%),
+        var(--paper-texture),
+        var(--paper-base);
+    position: absolute; top: 0; left: 0;
+    padding: 60px 25px 30px 25px;
+    box-sizing: border-box;
+    transform-origin: left center; 
+    transition: transform 1s cubic-bezier(0.645, 0.045, 0.355, 1);
+    cursor: pointer; 
+    display: flex; flex-direction: column;
+    backface-visibility: hidden;
+    border-left: 1px solid rgba(0,0,0,0.1);
+}
+
+.page.flipped { 
+    transform: rotateY(-180deg) rotateZ(-1deg) translateX(20px); 
+    box-shadow: 15px 10px 30px rgba(0,0,0,0.3);
+}
+
+.page-content {
+    flex-grow: 1; overflow-y: auto; white-space: pre-wrap; 
+    word-wrap: break-word; line-height: 1.8; font-size: 22px; 
+    color: var(--ink-color); font-family: 'Indie Flower', cursive;
+    letter-spacing: 3px; word-spacing: 4px;
+    background-image: linear-gradient(var(--line-color) 1px, transparent 1px);
+    background-size: 100% 1.8em;    background-attachment: local; /* Tambahkan baris ini */    z-index: 1; position: relative;
+}
+
+.page-footer {
+    font-size: 11px; color: var(--ink-color); opacity: 0.6;
+    text-align: left; border-top: 1px solid var(--line-color); 
+    padding-top: 15px; margin-top: 10px;
+}
+
+.action-bar { 
+    display: flex; 
+    justify-content: flex-end; 
+    gap: 15px; 
+    margin-bottom: 15px; 
+    border-bottom: 2px solid var(--fab-bg); /* Berubah jadi cokelat/emas */
+    padding-bottom: 10px;    position: relative;    z-index: 999 !important; 
+    background: transparent; 
+}
+.author-info { margin-right: auto; }
+.author-name { 
+    font-weight: bold; 
+    color: var(--fab-bg); /* Nama penulis mengikuti warna tema */
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    font-size: 16px; 
+    text-transform: uppercase; 
+}
+.timestamp { font-size: 12px; color: var(--ink-color); opacity: 0.7; margin-top: 4px; font-style: italic; }
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 18px; /* Sedikit lebih besar agar mudah ditekan di HP */
+    color: var(--ink-color);
+    opacity: 0.8;
+    cursor: pointer;
+    /* Memastikan area klik bersih */
+    position: relative;
+    padding: 5px;
+}
+.icon-btn.delete { color: #e74c3c; opacity: 1; }
+
+.cover {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2c3e50 50%, #000 100%) !important;
+    color: #f39c12 !important;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    text-align: center;
+    border-left: 8px solid #b8860b !important; /* Tekstur punggung buku emas */
+    box-shadow: inset -15px 0 30px rgba(0,0,0,0.7);
+}
+
+.cover-content {
+    border: 1px solid rgba(243, 156, 18, 0.3);
+    padding: 40px 20px;
+    margin: 20px;
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.cover-content::before, .cover-content::after {
+    content: "∞";
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.5rem;
+    opacity: 0.5;
+}
+.cover-content::before { top: 10px; }
+.cover-content::after { bottom: 10px; }
+
+.cover h1 {
+    font-size: 2.5rem;
+    font-family: 'Indie Flower', cursive;
+    margin: 0;
+    letter-spacing: 2px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.cover h2 {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    margin: 20px 0;
+    font-weight: 300;
+    color: #fff;
+}
+
+.couple-names {
+    font-family: 'Indie Flower', cursive;
+    font-size: 1.8rem;
+    color: #f1c40f;
+    margin-top: 10px;
+}
+
+.toc-title { text-align: center; font-family: 'Indie Flower', cursive; font-size: 32px; border-bottom: 2px dashed var(--ink-color); margin-bottom: 15px; color: var(--ink-color); }
+.toc-scroll-area { flex-grow: 1; overflow-y: auto; padding-right: 5px; margin-bottom: 10px; }
+.toc-list { list-style: none; padding: 0; margin: 0; font-family: 'Indie Flower', cursive; }
+.toc-item { display: flex; justify-content: space-between; padding: 12px 5px; border-bottom: 1px solid var(--line-color); cursor: pointer; font-size: 24px; letter-spacing: 2px; }
+.toc-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 80%; }
+
+/* MODAL */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center;
+    z-index: 6000; backdrop-filter: blur(5px); padding: 20px; box-sizing: border-box;
+}
+.modal-overlay.active { display: flex; }
+.bubble-input {
+    background: var(--modal-bg); padding: 25px; border-radius: 20px; width: 100%; max-width: 400px;
+    display: flex; flex-direction: column; gap: 15px;
+}
+input, textarea {
+    width: 100%; padding: 15px; border: 1px solid var(--input-border); border-radius: 12px;
+    background: var(--input-bg); color: var(--text-color); font-size: 16px; outline: none; box-sizing: border-box;
+}
+.save-btn { 
+    background: var(--fab-bg); 
+    color: var(--fab-color); 
+    border: 1px solid var(--fab-color);
+    padding: 15px; 
+    border-radius: 12px; 
+    font-weight: bold; 
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: opacity 0.2s;
+}.save-btn:hover {
+    opacity: 0.9;
+}
+.cancel-btn { background: #95a5a6; color: white; border: none; padding: 10px; border-radius: 12px; cursor: pointer; }
+
+@media (min-width: 451px) {
+    .book { width: 450px; height: 650px; }
+    .page { border-radius: 0 15px 15px 0; }
+}
+    </style>
+</head>
+<body>
+
+    <div class="fab-container" id="fabMenu">
+        <button class="fab-main" onclick="toggleFabMenu()">
+            <i class="fas fa-plus"></i>
+        </button>
+        
+        <button class="fab-sub" onclick="bukaModalBaru(); toggleFabMenu();" title="Tambah Catatan">
+            <i class="fas fa-pen"></i>
+        </button>
+        
+        <button class="fab-sub" id="themeBtn" onclick="toggleTheme()" title="Ganti Tema">
+            <i class="fas fa-moon"></i>
+        </button>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="bubble-input">
+            <h3 style="margin:0; color: var(--text-color)" id="modalTitle">Catatan Baru</h3>
+            <input type="text" id="nameInput" placeholder="Nama Anda" oninput="window.handleInput(this, 'name')" autocapitalize="words">
+            <textarea id="noteInput" placeholder="Tulis cerita harimu..." oninput="window.handleInput(this, 'text')" autocapitalize="sentences"></textarea>
+            <button class="save-btn" onclick="simpanCatatan()">SIMPAN</button>
+            <button class="cancel-btn" onclick="toggleModal(false)">Batal</button>
+        </div>
+    </div>
+
+    <div class="book-container">
+        <div id="book" class="book">
+<div class="page cover" id="front-cover" onclick="flipPage(this)">
+    <div class="cover-content">
+        <h2>Our Daily Notes</h2>
+        <h1>BEAUTIFUL MEMORIES</h1>
+        <div class="couple-names">K & N</div> <p style="font-size: 0.8rem; letter-spacing: 3px; margin-top: 30px; opacity: 0.6; color: white;">
+            EST. 2025
+        </p>
+        <div style="margin-top: auto; font-size: 0.7rem; opacity: 0.4; color: white;">
+            TAP TO UNVEILs
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
+
+<script type="module">
+    // 1. IMPORT FIREBASE SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { 
+        getFirestore, collection, addDoc, deleteDoc, doc, updateDoc, query, orderBy, onSnapshot 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    // 2. KONFIGURASI FIREBASE ANDA
+    const firebaseConfig = {
+        apiKey: "AIzaSyAyZSWCJq5fOghx8uU4Z0B8tTIi_TyyXgg",
+        authDomain: "jurnal-3d.firebaseapp.com",
+        databaseURL: "https://jurnal-3d-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "jurnal-3d",
+        storageBucket: "jurnal-3d.firebasestorage.app",
+        messagingSenderId: "616920448909",
+        appId: "1:616920448909:web:5cecf2f4098e7624c547c4"
+    };
+
+    // Inisialisasi Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 3. VARIABEL GLOBAL
+    const book = document.getElementById('book');
+    const modal = document.getElementById('modalOverlay');
+    const inputName = document.getElementById('nameInput');
+    const inputNote = document.getElementById('noteInput');
+    const fabMenu = document.getElementById('fabMenu');
+    let editingId = null;window.handleInput = (el, type) => {
+    let cursorPosition = el.selectionStart; 
+    let val = el.value;
+
+    if (type === 'name') {
+        // Kapital setiap awal kata (Budi Sudarsono)
+        el.value = val.replace(/\b\w/g, (l) => l.toUpperCase());
+    } 
+    else if (type === 'text') {
+        // Kapital awal paragraf
+        let formatted = val.charAt(0).toUpperCase() + val.slice(1);
+        
+        // Kapital setelah tanda titik/tanya/seru yang diikuti spasi
+        formatted = formatted.replace(/([.!?]\s+)(\w)/g, (match, p1, p2) => {
+            return p1 + p2.toUpperCase();
+        });
+
+        el.value = formatted;
+    }
+    el.setSelectionRange(cursorPosition, cursorPosition);
+};
+
+    // 4. FUNGSI LISTENER REAL-TIME
+    function initRealtimeListener() {
+        const q = query(collection(db, "notes"), orderBy("createdAt", "asc"));
+
+        onSnapshot(q, (querySnapshot) => {
+            // Bersihkan halaman lama kecuali cover depan
+            const pages = document.querySelectorAll('.page:not(#front-cover)');
+            pages.forEach(p => p.remove());
+
+            const saved = [];
+            querySnapshot.forEach((doc) => {
+                saved.push({ id: doc.id, ...doc.data() });
+            });
+
+            // --- RENDER DAFTAR ISI ---
+            const tocPage = document.createElement('div');
+            tocPage.className = 'page';
+            let tocHTML = `<h3 class="toc-title">Daftar Isi</h3><div class="toc-scroll-area">`; 
+            
+            if(saved.length === 0) {
+                tocHTML += `<p style="text-align:center; opacity:0.6; font-family:'Indie Flower'; margin-top:20px;">Belum ada catatan.</p>`;
+            } else {
+                tocHTML += `<ul class="toc-list">`;
+                saved.forEach((item, i) => {
+                    const snippet = item.isi.length > 25 ? item.isi.substring(0, 25) + '...' : item.isi;
+                    tocHTML += `<li class="toc-item" onclick="window.jumpToPage(${i}, event)">
+                                    <span class="toc-text">${snippet}</span>
+                                    <span class="toc-page-num">${i + 1}</span>
+                                </li>`;
+                });
+                tocHTML += `</ul>`;
+            }
+            tocHTML += `</div><div class="page-footer">Indeks</div>`;
+            tocPage.innerHTML = tocHTML;
+            tocPage.onclick = function() { window.flipPage(this); };
+            book.appendChild(tocPage);
+
+            // --- RENDER HALAMAN CATATAN ---
+            saved.forEach((item, i) => {
+                const newPage = document.createElement('div');
+                newPage.className = 'page';
+                newPage.innerHTML = `
+                    <div class="action-bar">
+                        <div class="author-info">
+                            <div class="author-name"><i class="fas fa-user"></i> ${item.nama}</div>
+                            <div class="timestamp">${item.waktu}</div>
+                        </div>
+                        <button class="icon-btn" onclick="window.editCatatan('${item.id}', '${item.nama}', \`${item.isi}\`, event)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="icon-btn delete" onclick="window.hapusCatatan('${item.id}', event)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="page-content">${item.isi}</div>
+                    <div class="page-footer">Halaman ${i + 1}</div>
+                `;
+                newPage.onclick = function() { window.flipPage(this); };
+                book.appendChild(newPage);
+            });
+
+            // --- COVER BELAKANG ---
+            const back = document.createElement('div');
+            back.className = 'page cover';
+            back.innerHTML = `<h2>SELESAI</h2><p>${saved.length} Catatan tersimpan</p>`;
+            back.onclick = function() { window.flipPage(this); };
+            book.appendChild(back);
+            
+            reorderZIndex();
+        });
+    }
+
+    // 5. FUNGSI OPERASI DATA (CRUD)
+window.simpanCatatan = async function() {
+    let namaRaw = inputName.value.trim() || "Anonim";
+    let isiRaw = inputNote.value.trim();
+
+    if(!isiRaw) return alert("Isi tidak boleh kosong");
+
+    // 1. Rapikan Nama: Setiap awal kata kapital (Tanpa paksa lowercase di tengah)
+    const namaFix = namaRaw.replace(/\b\w/g, (l) => l.toUpperCase());
+
+    // 2. Rapikan Isi: 
+    // - Kapital di awal paragraf atau setelah tanda titik/tanya/seru
+    // - MENGHAPUS .toLowerCase() agar user bisa mengetik huruf kapital manual
+    let isiFix = isiRaw.replace(/(^\s*\w|[.!?]\s+\w)/g, (match) => match.toUpperCase());
+
+    // 3. Membersihkan spasi ganda horizontal saja (spasi/tab)
+    // - Menggunakan [ \t]+ agar \n (baris baru/enter) tetap dipertahankan
+    isiFix = isiFix.replace(/[ \t]+/g, ' ');
+
+    const now = new Date();
+    const formatLengkap = now.toLocaleDateString('id-ID', { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'short', 
+        year: 'numeric' 
+    }) + ", " + now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }).replace('.', ':');
+    
+    const data = { 
+        nama: namaFix, 
+        isi: isiFix, 
+        waktu: formatLengkap,
+        createdAt: now 
+    };
+
+    try {
+        if(editingId) {
+            await updateDoc(doc(db, "notes", editingId), {
+                nama: data.nama,
+                isi: data.isi
+            });
+        } else {
+            await addDoc(collection(db, "notes"), data);
+        }
+        window.toggleModal(false);
+    } catch (e) {
+        alert("Error: " + e.message);
+    }
+};
+window.hapusCatatan = async function(id, e) {
+    if (e) e.stopPropagation(); // Mencegah halaman terbalik saat klik tombol
+    
+    if (confirm("Apakah Anda yakin ingin menghapus catatan ini?")) {
+        try {
+            await deleteDoc(doc(db, "notes", id));
+        } catch (error) {
+            console.error("Gagal menghapus:", error);
+            alert("Gagal menghapus catatan.");
+        }
+    }
+};
+
+// Fungsi untuk membuka modal edit dengan data lama
+window.editCatatan = function(id, nama, isi, e) {
+    // Mencegah halaman berbalik saat tombol edit diklik
+    if (e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+    
+    editingId = id; 
+    inputName.value = nama;
+    inputNote.value = isi;
+    
+    document.getElementById('modalTitle').innerText = "Edit Catatan";
+    window.toggleModal(true);
+};
+    // 6. FUNGSI UI & NAVIGASI
+    window.toggleFabMenu = () => fabMenu.classList.toggle('active');
+
+    window.toggleTheme = () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const target = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', target);
+        localStorage.setItem('theme', target);
+        document.getElementById('themeBtn').innerHTML = target === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    };
+
+    window.toggleModal = (show) => {
+        modal.classList.toggle('active', show);
+        if(!show) {
+            editingId = null;
+            document.getElementById('modalTitle').innerText = "Catatan Baru";
+        }
+    };
+
+    window.bukaModalBaru = () => {
+        editingId = null;
+        inputName.value = "";
+        inputNote.value = "";
+        window.toggleModal(true);
+    };
+
+    window.flipPage = (el) => {
+        el.classList.toggle('flipped');
+        setTimeout(reorderZIndex, 300);
+    };
+
+    function reorderZIndex() {
+        const pages = document.querySelectorAll('.page');
+        const frontCover = document.getElementById('front-cover');
+        
+        if (frontCover.classList.contains('flipped')) {
+            fabMenu.classList.add('visible');
+        } else {
+            fabMenu.classList.remove('visible');
+            fabMenu.classList.remove('active');
+        }
+
+        pages.forEach((page, i) => { 
+            page.style.zIndex = page.classList.contains('flipped') ? i : pages.length - i; 
+        });
+    }
+
+    window.jumpToPage = (noteIndex, e) => {
+        e.stopPropagation(); 
+        const targetDomIndex = noteIndex + 2;
+        const allPages = document.querySelectorAll('.page');
+        allPages.forEach((page, domIndex) => {
+            if (domIndex < targetDomIndex) page.classList.add('flipped');
+            else page.classList.remove('flipped');
+        });
+        setTimeout(reorderZIndex, 50);
+    };
+
+    // 7. INISIALISASI AWAL
+    window.onload = () => {
+        if(localStorage.getItem('theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.getElementById('themeBtn').innerHTML = '<i class="fas fa-sun"></i>';
+        }
+        initRealtimeListener();
+    };
+
+    // GESTURE SWIPE
+    let touchX = 0;
+    document.addEventListener('touchstart', e => touchX = e.changedTouches[0].screenX);
+    document.addEventListener('touchend', e => {
+        const diff = e.changedTouches[0].screenX - touchX;
+        if (diff < -50) {
+            const p = [...document.querySelectorAll('.page:not(.flipped)')][0];            if(p) window.flipPage(p);
+        } else if (diff > 50) {
+            const p = [...document.querySelectorAll('.page.flipped')].pop();
+            if(p) window.flipPage(p);
+        }
+    });
+</script>
+</body>
+</html>
