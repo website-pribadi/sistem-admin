@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Admin</title>
     <link rel="icon" type="image/png" href="admin.png">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
     
     <style>
@@ -81,10 +79,6 @@
             color: var(--accent-color);
         }
 
-        .logo-icon {
-            font-size: 32px;
-        }
-
         .logo-text {
             font-size: 28px;
             font-weight: 700;
@@ -98,18 +92,23 @@
             margin-bottom: 5px;
         }
 
+        /* User List Style */
         .user-list {
             background: var(--bg-primary);
             border-radius: 6px;
             padding: 15px;
-            margin-top: 15px;
+            margin-top: 25px;
             border-left: 3px solid var(--accent-color);
+            display: none; /* Hidden by default, shown via JS */
         }
 
         .user-list h4 {
             font-size: 14px;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .user-list ul {
@@ -118,8 +117,16 @@
         }
 
         .user-list li {
-            padding: 4px 0;
+            padding: 6px 0;
             color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            border-bottom: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .user-list li:hover {
+            color: var(--accent-color);
+            padding-left: 5px;
         }
 
         .user-list li i {
@@ -264,26 +271,11 @@
             display: inline-block;
         }
 
-        /* Responsive */
         @media (max-width: 480px) {
-            .login-card {
-                padding: 30px 25px;
-            }
-            
-            .logo-text {
-                font-size: 24px;
-            }
-            
-            .logo-icon {
-                font-size: 28px;
-            }
-            
-            .login-subtitle {
-                font-size: 14px;
-            }
+            .login-card { padding: 30px 25px; }
+            .logo-text { font-size: 24px; }
         }
 
-        /* Toast Notification */
         .toast {
             position: fixed;
             bottom: 30px;
@@ -299,30 +291,15 @@
             animation: slideIn 0.3s ease;
         }
 
-        .toast.show {
-            display: block;
-        }
-
-        .toast.error {
-            background: var(--error-color);
-        }
-
-        .toast.success {
-            background: var(--success-color);
-        }
+        .toast.show { display: block; }
+        .toast.error { background: var(--error-color); }
+        .toast.success { background: var(--success-color); }
 
         @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
-        /* Dark mode support */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-primary: #1a1a1a;
@@ -335,7 +312,6 @@
             }
         }
 
-        /* Shake animation */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -351,8 +327,6 @@
                     <span class="logo-text">Sistem Admin</span>
                 </div>
                 <p class="login-subtitle">Masukkan username dan password untuk mengakses sistem</p>
-                
-              
             </div>
 
             <form class="login-form" id="loginForm">
@@ -402,17 +376,22 @@
                 </button>
             </form>
 
+            <div class="user-list" id="userListContainer">
+                <h4><i class="fas fa-users"></i> Daftar Username Tersedia:</h4>
+                <ul id="availableUsers">
+                    </ul>
+            </div>
+
         </div>
     </div>
 
     <div class="toast" id="toast"></div>
 
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
     <script>
-        // Firebase Configuration (sama dengan File Explorer)
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDphSi4A7tZ6xkbUHcuNBxlbjhYm9y2MOE",
             authDomain: "file-expoler-fcc6d.firebaseapp.com",
@@ -424,7 +403,6 @@
             measurementId: "G-5GZ4XJZ4BL"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
@@ -437,12 +415,35 @@
         const usernameError = document.getElementById('usernameError');
         const passwordError = document.getElementById('passwordError');
         const toast = document.getElementById('toast');
+        const userListContainer = document.getElementById('userListContainer');
+        const availableUsers = document.getElementById('availableUsers');
 
-        // Database path untuk password
         const PASSWORD_PATH = "app_password/password";
-
-        // List username yang diblokir (tidak boleh digunakan)
         const BLOCKED_USERNAMES = ['login', 'index', 'home', 'admin', 'administrator', 'root'];
+
+        // Function: Load Users from Firebase (PENAMBAHAN BARU)
+        function loadAvailableUsers() {
+            database.ref('portal_masuk').on('value', (snapshot) => {
+                const data = snapshot.val();
+                availableUsers.innerHTML = "";
+                
+                if (data) {
+                    userListContainer.style.display = 'block';
+                    Object.keys(data).forEach(id => {
+                        const user = data[id];
+                        const li = document.createElement('li');
+                        li.innerHTML = `<i class="fas fa-chevron-right"></i> ${user.username}`;
+                        li.onclick = () => {
+                            usernameInput.value = user.username;
+                            passwordInput.focus();
+                        };
+                        availableUsers.appendChild(li);
+                    });
+                } else {
+                    userListContainer.style.display = 'none';
+                }
+            });
+        }
 
         // Toggle Password Visibility
         togglePasswordBtn.addEventListener('click', function() {
@@ -451,265 +452,91 @@
             this.innerHTML = type === 'password' ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye-slash"></i>';
         });
 
-        // Show Toast Notification
+        // UI Helpers
         function showToast(message, type = 'info', duration = 3000) {
             toast.textContent = message;
             toast.className = 'toast ' + type;
             toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, duration);
+            setTimeout(() => { toast.classList.remove('show'); }, duration);
         }
 
-        // Show Error Message
         function showError(element, message) {
             element.textContent = message;
             element.classList.add('show');
         }
 
-        // Clear Errors
         function clearErrors() {
             usernameError.classList.remove('show');
             passwordError.classList.remove('show');
         }
 
-        // Validate Inputs
+        // Validation & Auth Logic
         function validateInputs(username, password) {
             clearErrors();
             let isValid = true;
-            
             const cleanUsername = username.toLowerCase().trim();
             
-            if (!username) {
-                showError(usernameError, 'Username tidak boleh kosong');
-                isValid = false;
-            } else if (cleanUsername.length < 3) {
-                showError(usernameError, 'Username minimal 3 karakter');
-                isValid = false;
-            } else if (!/^[a-z0-9_-]+$/i.test(cleanUsername)) {
-                showError(usernameError, 'Username hanya boleh mengandung huruf, angka, underscore (_), dan dash (-)');
-                isValid = false;
-            } else if (BLOCKED_USERNAMES.includes(cleanUsername)) {
-                showError(usernameError, 'Username ini tidak diperbolehkan');
-                isValid = false;
-            }
+            if (!username) { showError(usernameError, 'Username tidak boleh kosong'); isValid = false; }
+            else if (cleanUsername.length < 3) { showError(usernameError, 'Username minimal 3 karakter'); isValid = false; }
+            else if (!/^[a-z0-9_-]+$/i.test(cleanUsername)) { showError(usernameError, 'Username tidak valid'); isValid = false; }
+            else if (BLOCKED_USERNAMES.includes(cleanUsername)) { showError(usernameError, 'Username ini dilarang'); isValid = false; }
             
-            if (!password) {
-                showError(passwordError, 'Password tidak boleh kosong');
-                isValid = false;
-            } else if (password.length < 4) {
-                showError(passwordError, 'Password minimal 4 karakter');
-                isValid = false;
-            }
-            
+            if (!password) { showError(passwordError, 'Password tidak boleh kosong'); isValid = false; }
             return isValid;
         }
 
-        // Set Loading State
         function setLoading(isLoading) {
             loginBtn.disabled = isLoading;
-            loginBtn.querySelector('.btn-text').textContent = isLoading 
-                ? 'Memverifikasi...' 
-                : 'Masuk ke Sistem';
+            loginBtn.querySelector('.btn-text').textContent = isLoading ? 'Memverifikasi...' : 'MASUK';
             loginBtn.querySelector('.loading-spinner').style.display = isLoading ? 'inline-block' : 'none';
         }
 
-        // Get Password from Firebase Database
-        async function getPasswordFromFirebase() {
-            try {
-                const snapshot = await database.ref(PASSWORD_PATH).once('value');
-                return snapshot.val();
-            } catch (error) {
-                console.error('Error getting password from Firebase:', error);
-                return null;
-            }
-        }
-
-        // Check Password Match
-        async function checkPassword(inputPassword) {
-            try {
-                // Tambahkan delay kecil untuk UX
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // Ambil password dari Firebase
-                const storedPassword = await getPasswordFromFirebase();
-                
-                // Cek apakah password ada di database
-                if (storedPassword === null) {
-                    showError(passwordError, 'Password belum diatur di database');
-                    showToast('Silahkan buat password terlebih dahulu di Firebase', 'error');
-                    return false;
-                }
-                
-                // Bandingkan password input dengan password di database
-                return inputPassword === storedPassword;
-                
-            } catch (error) {
-                console.error('Error checking password:', error);
-                showError(passwordError, 'Terjadi kesalahan sistem');
-                return false;
-            }
-        }
-
-        // Generate Target Page from Username
-        function generateTargetPage(username) {
-            const cleanUsername = username.toLowerCase().trim();
-            
-            // Bersihkan username dari karakter yang tidak aman untuk nama file
-            const safeUsername = cleanUsername.replace(/[^a-z0-9_-]/g, '');
-            
-            // Generate nama file: username.html
-            return `${safeUsername}.html`;
-        }
-
-        // Check if page exists (optional - bisa diaktifkan jika mau)
-        async function checkPageExists(pageName) {
-            // Ini hanya simulasi sederhana
-            // Di implementasi nyata, Anda mungkin ingin mengecek ke server
-            return true; // Asumsi halaman ada
-        }
-
-        // Login Function
         async function login(username, password) {
             try {
                 setLoading(true);
-                
                 const cleanUsername = username.toLowerCase().trim();
                 
-                // Cek password
-                const passwordValid = await checkPassword(password);
+                const snapshot = await database.ref(PASSWORD_PATH).once('value');
+                const storedPassword = snapshot.val();
                 
-                if (!passwordValid) {
-                    showError(passwordError, 'Password salah');
-                    showToast('Password tidak valid', 'error');
-                    
-                    // Shake animation
+                if (storedPassword === null || password !== storedPassword) {
+                    showError(passwordError, 'Password salah atau belum diatur');
                     passwordInput.style.animation = 'shake 0.5s';
-                    setTimeout(() => {
-                        passwordInput.style.animation = '';
-                    }, 500);
-                    
-                    // Clear password field
-                    passwordInput.value = '';
-                    passwordInput.focus();
+                    setTimeout(() => { passwordInput.style.animation = ''; }, 500);
                     setLoading(false);
                     return;
                 }
-                
-                // Password cocok, generate halaman tujuan
-                const targetPage = generateTargetPage(cleanUsername);
-                
-                // Cek apakah halaman ada (optional)
-                const pageExists = await checkPageExists(targetPage);
-                
-                if (!pageExists) {
-                    showToast(`Catatan: Halaman ${targetPage} belum dibuat`, 'info', 4000);
-                }
-                
-                // Simpan session
+
                 sessionStorage.setItem('fileExplorerLoggedIn', 'true');
-                sessionStorage.setItem('loginTime', Date.now());
                 sessionStorage.setItem('username', cleanUsername);
-                sessionStorage.setItem('targetPage', targetPage);
+                const targetPage = `${cleanUsername}.html`;
                 
-                showToast(`Login berhasil! Mengarahkan ke ${targetPage}...`, 'success');
-                
-                // Redirect ke halaman yang sesuai setelah 1.5 detik
-                setTimeout(() => {
-                    window.location.href = targetPage;
-                }, 1500);
+                showToast(`Login berhasil! Mengarahkan...`, 'success');
+                setTimeout(() => { window.location.href = targetPage; }, 1500);
                 
             } catch (error) {
-                console.error('Login error:', error);
-                showToast('Terjadi kesalahan sistem', 'error');
+                showToast('Kesalahan sistem', 'error');
                 setLoading(false);
             }
         }
 
-        // Form Submission
+        // Event Listeners
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             const username = usernameInput.value.trim();
             const password = passwordInput.value.trim();
-            
-            if (!validateInputs(username, password)) return;
-            
-            await login(username, password);
+            if (validateInputs(username, password)) await login(username, password);
         });
 
-        // Enter key to submit
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !loginBtn.disabled) {
-                loginForm.dispatchEvent(new Event('submit'));
-            }
-        });
-
-        // Auto focus on username input
         window.addEventListener('load', function() {
             usernameInput.focus();
+            loadAvailableUsers(); // Jalankan loader username
             
-            // Check if already logged in
             const isLoggedIn = sessionStorage.getItem('fileExplorerLoggedIn');
-            const loginTime = parseInt(sessionStorage.getItem('loginTime') || '0');
-            const currentTime = Date.now();
-            const sessionDuration = 8 * 60 * 60 * 1000; // 8 jam
-            const username = sessionStorage.getItem('username');
-            const targetPage = sessionStorage.getItem('targetPage');
-            
-            if (isLoggedIn === 'true' && (currentTime - loginTime) < sessionDuration && username && targetPage) {
-                // Auto redirect jika session masih valid
-                window.location.href = targetPage;
+            if (isLoggedIn === 'true' && sessionStorage.getItem('username')) {
+                window.location.href = `${sessionStorage.getItem('username')}.html`;
             }
         });
-
-        // Function untuk membuat password di Firebase (bisa dipanggil dari console)
-        window.createPasswordInFirebase = async function(password) {
-            if (!password || password.length < 4) {
-                alert('Password minimal 4 karakter');
-                return;
-            }
-            
-            try {
-                await database.ref(PASSWORD_PATH).set(password);
-                alert('Password berhasil dibuat di Firebase!');
-                console.log('Password berhasil disimpan di path:', PASSWORD_PATH);
-            } catch (error) {
-                alert('Gagal menyimpan password: ' + error.message);
-            }
-        };
-
-        // Function untuk mengecek halaman apa yang akan diakses dengan username tertentu
-        window.checkUsernameRedirect = function(username) {
-            const cleanUsername = (username || '').toLowerCase().trim();
-            
-            if (!cleanUsername) {
-                alert('Masukkan username');
-                return;
-            }
-            
-            const targetPage = generateTargetPage(cleanUsername);
-            alert(`Username "${cleanUsername}" akan diarahkan ke: ${targetPage}`);
-            console.log(`Username: ${cleanUsername} -> Halaman: ${targetPage}`);
-        };
-
-        // Function untuk menampilkan contoh username
-        window.showExamples = function() {
-            const examples = [
-                'amin → amin.html',
-                'webchat → webchat.html',
-                'page → page.html',
-                'user1 → user1.html',
-                'myprofile → myprofile.html',
-                'dashboard → dashboard.html'
-            ];
-            
-            console.log('Contoh username dan halaman tujuan:');
-            examples.forEach(example => console.log(`  ${example}`));
-            
-            alert('Lihat console untuk contoh username');
-        };
     </script>
 </body>
 </html>
