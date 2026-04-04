@@ -3,10 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Admin</title>
+    <title>Panel Admin - Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
+    <script>
+        /* --- SECURITY CHECK --- */
+        (function() {
+            const isLoggedIn = sessionStorage.getItem('fileExplorerLoggedIn');
+            const loginTime = parseInt(sessionStorage.getItem('loginTime') || '0');
+            const currentTime = Date.now();
+            const sessionDuration = 28800000; // 8 Jam (Sesuai pengaturan di index.html)
+
+            // Jika tidak ada session atau session sudah kadaluwarsa, tendang ke index.html
+            if (isLoggedIn !== 'true' || (currentTime - loginTime) > sessionDuration) {
+                window.location.href = 'index.html';
+            }
+        })();
+    </script>
+
     <style>
         :root {
             --bg-body: #f4f7fe;
@@ -49,7 +64,6 @@
         th { text-align: left; color: var(--text-muted); font-size: 13px; padding: 12px; border-bottom: 1px solid #eee; }
         td { padding: 15px 12px; border-bottom: 1px solid #f8f8f8; font-size: 14px; }
 
-        /* Inline Edit Style */
         .edit-input { width: 100%; padding: 8px; border: 1px solid var(--primary); border-radius: 8px; outline: none; font-size: 14px; }
         
         .btn { padding: 10px 18px; border: none; border-radius: 12px; cursor: pointer; font-weight: 600; transition: 0.3s; font-size: 13px; }
@@ -78,9 +92,9 @@
 
     <main class="main-content">
         <header class="header">
-            <h1 id="section-title">Dashboard</h1>
+            <h1 id="section-title">Dashboard Utama</h1>
             <div class="user-pill">
-                <span id="displayUsername" style="font-weight: 600;">ADMIN</span>
+                <span id="displayUsername" style="font-weight: 600; text-transform: uppercase;">ADMIN</span>
             </div>
         </header>
 
@@ -94,8 +108,7 @@
                 <h3>Log Aktivitas</h3>
                 <table id="log-table">
                     <thead><tr><th>WAKTU</th><th>USER</th><th>AKSI</th></tr></thead>
-                    <tbody id="log-body">
-                        </tbody>
+                    <tbody id="log-body"></tbody>
                 </table>
             </div>
         </div>
@@ -114,8 +127,7 @@
                             <th style="text-align: center;">AKSI</th>
                         </tr>
                     </thead>
-                    <tbody id="portal-table-body">
-                        </tbody>
+                    <tbody id="portal-table-body"></tbody>
                 </table>
             </div>
         </div>
@@ -149,27 +161,24 @@
         import { getDatabase, ref, set, push, onValue, remove, update } 
         from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // === 1. KONFIGURASI FIREBASE ===
-        // Ganti dengan konfigurasi dari Firebase Console Anda!
-const firebaseConfig = {
-  apiKey: "AIzaSyDphSi4A7tZ6xkbUHcuNBxlbjhYm9y2MOE",
-  authDomain: "file-expoler-fcc6d.firebaseapp.com",
-  databaseURL: "https://file-expoler-fcc6d-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "file-expoler-fcc6d",
-  storageBucket: "file-expoler-fcc6d.firebasestorage.app",
-  messagingSenderId: "790757380418",
-  appId: "1:790757380418:web:f24667fd81646e6f0f38db",
-  measurementId: "G-5GZ4XJZ4BL"
-};
+        const firebaseConfig = {
+            apiKey: "AIzaSyDphSi4A7tZ6xkbUHcuNBxlbjhYm9y2MOE",
+            authDomain: "file-expoler-fcc6d.firebaseapp.com",
+            databaseURL: "https://file-expoler-fcc6d-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "file-expoler-fcc6d",
+            storageBucket: "file-expoler-fcc6d.firebasestorage.app",
+            messagingSenderId: "790757380418",
+            appId: "1:790757380418:web:f24667fd81646e6f0f38db",
+            measurementId: "G-5GZ4XJZ4BL"
+        };
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const portalRef = ref(db, 'portal_masuk');
 
-        // === 2. READ DATA (REALTIME) ===
         onValue(portalRef, (snapshot) => {
             const tbody = document.getElementById('portal-table-body');
-            tbody.innerHTML = ""; // Reset tabel sebelum render ulang
+            tbody.innerHTML = ""; 
             const data = snapshot.val();
             
             if (data) {
@@ -197,7 +206,6 @@ const firebaseConfig = {
             }
         });
 
-        // === 3. CREATE DATA ===
         window.tambahBaris = function() {
             const newUser = {
                 username: "User_Baru_" + Math.floor(Math.random() * 100),
@@ -206,14 +214,12 @@ const firebaseConfig = {
             push(portalRef, newUser);
         };
 
-        // === 4. DELETE DATA ===
         window.handleDelete = function(id) {
             if(confirm('Hapus akun ini secara permanen?')) {
                 remove(ref(db, `portal_masuk/${id}`));
             }
         };
 
-        // === 5. UPDATE DATA (EDIT INLINE) ===
         window.handleEdit = function(id, btn) {
             const row = btn.closest('tr');
             const userCell = row.querySelector('.editable-user');
@@ -243,7 +249,14 @@ const firebaseConfig = {
     </script>
 
     <script>
-        // Navigasi Standar
+        // Inisialisasi Nama Pengguna
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = sessionStorage.getItem('username');
+            if (user) {
+                document.getElementById('displayUsername').textContent = user;
+            }
+        });
+
         function showSection(sectionId, element) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
@@ -259,10 +272,12 @@ const firebaseConfig = {
             document.getElementById('section-title').textContent = titles[sectionId];
         }
 
+        // Fungsi Logout yang membersihkan session
         function logout() {
-            sessionStorage.clear();
-            alert('Logout Berhasil');
-            // window.location.href = 'login.html'; 
+            if (confirm('Yakin ingin keluar?')) {
+                sessionStorage.clear();
+                window.location.href = 'index.html';
+            }
         }
     </script>
 </body>
