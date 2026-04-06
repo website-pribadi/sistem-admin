@@ -48,7 +48,7 @@ html, body {
 #user-info {
   font-size: 16px;
   font-weight: 500;
-  text-transform: uppercase; /* Ini akan memaksa semua huruf menjadi besar */
+  text-transform: uppercase; 
 }
 
 .header-actions {
@@ -150,13 +150,13 @@ html, body {
   background: rgba(227, 242, 253, 0.9);
   border: 1px solid #90caf9;
   color: #1565c0;
-  text-transform: capitalize; /* Membuat huruf pertama tiap kata menjadi besar */
+  text-transform: capitalize; 
 }
 .status-pesan.logout {
   background: rgba(245, 245, 245, 0.9);
   border: 1px solid #e0e0e0;
   color: #616161;
-  text-transform: capitalize; /* Membuat huruf pertama tiap kata menjadi besar */
+  text-transform: capitalize; 
 }
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(5px); }
@@ -211,11 +211,10 @@ html, body {
 }
 .file-download:hover { background: #075e54; }
 
-/* Ganti kode lama Anda dengan ini */
 .pesan.highlight {
   animation: shake 0.5s ease-in-out;
   z-index: 100;
-  background: #e1f5fe !important; /* Biru muda pucat */
+  background: #e1f5fe !important; 
 }
 
 @keyframes shake {
@@ -235,7 +234,7 @@ html, body {
   overflow:hidden;
   text-overflow:ellipsis;
   white-space:nowrap;
-  line-height: 1.3 !important; /* Rapatkan jarak baris teks pesan */
+  line-height: 1.3 !important; 
 }
 .reply-preview:hover{ background:#e0f2f1; }
 .edited{
@@ -393,7 +392,7 @@ html, body {
 #sendBtn:active{ transform:scale(0.95); }
 #sendBtn:disabled{ background:#b2dfdb; cursor:not-allowed; }
 
-/* MODAL PREVIEW (Z-INDEX TINGGI: 4000) */
+/* MODAL PREVIEW */
 #preview-modal {
   display: none;
   position: fixed;
@@ -402,7 +401,7 @@ html, body {
   width: 100%;
   height: 100%;
   background: rgba(0,0,0,0.95);
-  z-index: 4000; /* PERBAIKAN: Lebih tinggi dari Galeri */
+  z-index: 4000; 
   justify-content: center;
   align-items: center;
   flex-direction: column;
@@ -574,7 +573,7 @@ html, body {
   border-radius: 5px; padding: 2px;
 }
 
-/* --- GALERI MEDIA MODAL (Z-INDEX MENENGAH: 3000) --- */
+/* --- GALERI MEDIA MODAL --- */
 #gallery-modal {
   display: none;
   position: fixed;
@@ -582,13 +581,13 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: #111; /* PERBAIKAN: Background Hitam */
-  z-index: 3000; /* PERBAIKAN: Di bawah Preview Modal */
+  background: #111; 
+  z-index: 3000; 
   flex-direction: column;
 }
 
 #gallery-header {
-  background: #202c33; /* Warna gelap WhatsApp Web */
+  background: #202c33; 
   color: #fff;
   padding: 15px;
   display: flex;
@@ -603,15 +602,12 @@ html, body {
   flex: 1;
   overflow-y: auto;
   display: grid;
-  /* Menggunakan auto-fill agar jumlah kolom menyesuaikan lebar layar */
-  /* Di HP akan tetap 3 kolom, di PC bisa 6-8 kolom */
   grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); 
-  gap: 4px; /* Sedikit diperlebar agar rapi di layar besar */
+  gap: 4px; 
   padding: 4px;
   align-content: start;
 }
 
-/* Tambahan: Agar modal galeri tidak terlalu lebar di PC (opsional) */
 @media (min-width: 768px) {
   #gallery-modal {
     max-width: 800px;
@@ -708,14 +704,14 @@ html, body {
 /* TOMBOL SCROLL KE BAWAH & BADGE */
 #scroll-bottom-btn {
   position: fixed;
-  bottom: 85px; /* Di atas input bar */
+  bottom: 85px; 
   right: 20px;
   width: 45px;
   height: 45px;
   background: white;
   border-radius: 50%;
   box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  display: none; /* Awalnya sembunyi */
+  display: none; 
   align-items: center;
   justify-content: center;
   cursor: pointer;
@@ -731,7 +727,7 @@ html, body {
   position: absolute;
   top: -5px;
   left: -5px;
-  background: #25d366; /* Hijau WA */
+  background: #25d366; 
   color: white;
   font-size: 11px;
   font-weight: bold;
@@ -757,18 +753,17 @@ html, body {
   border-radius: 2px;
   margin-top: 6px;
   overflow: hidden;
-  display: none; /* Sembunyi secara default */
+  display: none; 
 }
 
 .upload-progress-bar {
   height: 100%;
   width: 0%;
-  background-color: #128c7e; /* Warna Hijau WA */
+  background-color: #128c7e; 
   transition: width 0.2s ease-in-out;
   border-radius: 2px;
 }
 
-/* Animasi garis berjalan jika proses lama */
 .upload-progress-bar.processing {
   background-image: linear-gradient(
     45deg, 
@@ -801,7 +796,7 @@ html, body {
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  display: none; /* Sembunyi secara default */
+  display: none; 
   align-items: center;
   justify-content: center;
   transition: all 0.2s;
@@ -852,19 +847,19 @@ html, body {
   transform: translate(-50%, -50%);
   width: 40px;
   height: 40px;
-  background: rgba(0, 0, 0, 0.6); /* Hitam transparan */
+  background: rgba(0, 0, 0, 0.6); 
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
   font-size: 16px;
-  pointer-events: none; /* Agar klik tembus ke video untuk buka preview */
+  pointer-events: none; 
   z-index: 10;
   box-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 .video-chat-play i {
-  margin-left: 3px; /* Penyesuaian optik agar segitiga pas di tengah */
+  margin-left: 3px; 
 }
 </style>
 </head>
@@ -873,7 +868,10 @@ html, body {
 <div id="app">
 
 <div id="header">
-  <div id="user-info">WebChat</div>
+  <div style="display:flex; flex-direction:column;">
+    <div id="user-info">WebChat</div>
+    <div id="typing-status" style="font-size:11px; color: #d1f4cc; height: 12px; font-weight: normal; text-transform: none;"></div>
+  </div>
   <div class="header-actions">
     <button id="galleryBtn" onclick="openGallery()" title="Galeri Media">
       <i class="fa-solid fa-images"></i>
@@ -889,62 +887,61 @@ html, body {
   <div class="loading">Memuat percakapan...</div>
 </div>
 
-  <div id="input-area">
-    <div id="reply-bar">
-      <div id="reply-text"></div>
-      <span onclick="cancelReply()">✕</span>
+<div id="input-area">
+  <div id="reply-bar">
+    <div id="reply-text"></div>
+    <span onclick="cancelReply()">✕</span>
+  </div>
+
+  <div id="upload-preview"></div>
+
+  <div id="input-row">
+    <textarea id="input" placeholder="Ketik pesan..." rows="1"></textarea>
+    
+    <button id="fileBtn" title="Unggah file" onclick="document.getElementById('file-input').click()">
+      <i class="fa-solid fa-paperclip"></i>
+    </button>
+    
+    <button id="sendBtn" onclick="kirim()" title="Kirim pesan">
+      <i class="fa-solid fa-paper-plane"></i>
+    </button>
+    
+    <button id="voiceBtn" title="Rekam suara">
+      <i class="fa-solid fa-microphone" id="mic-icon"></i>
+    </button>
+  </div>
+
+  <div id="preview-modal" onclick="closePreview()">
+    <button id="prev-preview" class="nav-btn" onclick="navigatePreview(-1); event.stopPropagation()">‹</button>
+    <button id="next-preview" class="nav-btn" onclick="navigatePreview(1); event.stopPropagation()">›</button>
+
+    <div id="preview-content" onclick="event.stopPropagation()"></div>
+    <div id="close-preview" onclick="closePreview()">✕</div>
+    <div id="delete-preview" title="Hapus pesan ini">
+      <i class="fa-solid fa-trash"></i>
+    </div>
+  </div>
+    
+  <div id="gallery-modal">
+    <div id="gallery-header">
+      <span onclick="closeGallery()" style="cursor:pointer; font-size:24px;">←</span>
+      <span>Galeri Media</span>
+    </div>
+    
+    <div id="gallery-tabs" style="display:flex; background:#202c33; border-bottom:1px solid #333;">
+      <div class="g-tab active" onclick="switchGalleryTab('all')">Semua</div>
+      <div class="g-tab" onclick="switchGalleryTab('image')">Foto</div>
+      <div class="g-tab" onclick="switchGalleryTab('video')">Video</div>
+      <div class="g-tab" onclick="switchGalleryTab('doc')">Dokumen</div>
     </div>
 
-    <div id="upload-preview">
-      </div>
-
-<div id="input-row">
-  <textarea id="input" placeholder="Ketik pesan..." rows="1" oninput="autoResizeTextarea(this)"></textarea>
-  
-  <button id="fileBtn" title="Unggah file" onclick="document.getElementById('file-input').click()">
-    <i class="fa-solid fa-paperclip"></i>
-  </button>
-  
-  <button id="sendBtn" onclick="kirim()" title="Kirim pesan">
-    <i class="fa-solid fa-paper-plane"></i>
-  </button>
-  
-  <button id="voiceBtn" title="Rekam suara">
-    <i class="fa-solid fa-microphone" id="mic-icon"></i>
-  </button>
-</div>
-
-<div id="preview-modal" onclick="closePreview()">
-  <button id="prev-preview" class="nav-btn" onclick="navigatePreview(-1); event.stopPropagation()">‹</button>
-  <button id="next-preview" class="nav-btn" onclick="navigatePreview(1); event.stopPropagation()">›</button>
-
-  <div id="preview-content" onclick="event.stopPropagation()"></div>
-  <div id="close-preview" onclick="closePreview()">✕</div>
-  <div id="delete-preview" title="Hapus pesan ini">
-    <i class="fa-solid fa-trash"></i>
-  </div>
-</div>
-  
-<div id="gallery-modal">
-  <div id="gallery-header">
-    <span onclick="closeGallery()" style="cursor:pointer; font-size:24px;">←</span>
-    <span>Galeri Media</span>
-  </div>
-  
-  <div id="gallery-tabs" style="display:flex; background:#202c33; border-bottom:1px solid #333;">
-    <div class="g-tab active" onclick="switchGalleryTab('all')">Semua</div>
-    <div class="g-tab" onclick="switchGalleryTab('image')">Foto</div>
-    <div class="g-tab" onclick="switchGalleryTab('video')">Video</div>
-    <div class="g-tab" onclick="switchGalleryTab('doc')">Dokumen</div>
+    <div id="gallery-grid"></div>
   </div>
 
-  <div id="gallery-grid"></div>
-</div>
-
-<div id="scroll-bottom-btn" onclick="scrollToBottom()">
-  <span id="unread-badge">0</span>
-  <i class="fas fa-chevron-down arrow"></i>
-</div>
+  <div id="scroll-bottom-btn" onclick="scrollToBottom()">
+    <span id="unread-badge">0</span>
+    <i class="fas fa-chevron-down arrow"></i>
+  </div>
 
   <input type="file" id="file-input" multiple style="display:none;">
 
@@ -953,13 +950,11 @@ html, body {
 <script type="module">
 import imageCompression from 'https://esm.sh/browser-image-compression@2.0.2';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut }
-from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 import {
   getFirestore, collection, addDoc, query, orderBy,
   onSnapshot, doc, getDoc, updateDoc, deleteDoc, serverTimestamp,
-  writeBatch, getDocs, where, 
-  limitToLast, limit, startAfter 
+  writeBatch, getDocs, where, limitToLast, limit, startAfter, setDoc
 } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -983,6 +978,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 /* STATE */
+let user = null; 
 let username="", replyData=null;
 let isSending = false;
 let filesToUpload = [];
@@ -1002,6 +998,12 @@ let galleryListener = null;
 let previewFiles = [];
 let currentPreviewIndex = -1;
 
+/* STATE TYPING INDICATOR & ONLINE STATUS */
+let typingTimeout;
+const typingStatusEl = document.getElementById('typing-status');
+let currentGlobalStatusText = "";
+let currentGlobalStatusColor = "#d1f4cc";
+
 /* ELEMENT */
 const chatBox=document.getElementById("chat-box");
 const replyBar=document.getElementById("reply-bar");
@@ -1019,18 +1021,23 @@ const scrollBottomBtn = document.getElementById("scroll-bottom-btn");
 const unreadBadge = document.getElementById("unread-badge");
 
 /* UTIL FUNCTIONS */
+function sanitize(text){
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function linkify(text) {
+  const urlPattern = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+  return text.replace(urlPattern, '<a href="$1" target="_blank" style="color: #027eb5; text-decoration: underline;">$1</a>');
+}
+
 async function compressImage(file) {
   const options = { maxSizeMB: 1, maxWidthOrHeight: 1280, useWebWorker: true };
   try {
     const compressedFile = await imageCompression(file, options);
     return new File([compressedFile], file.name, { type: file.type, lastModified: Date.now() });
   } catch (error) { return file; }
-}
-
-function sanitize(text){
-  const div = document.createElement('div');
-  div.textContent = text;
-  return div.innerHTML;
 }
 
 function formatTime(timestamp){
@@ -1071,20 +1078,109 @@ function updateSend(){
     
     if (isRecording) {
       voiceBtn.classList.add("recording");
-      micIcon.className = "fa-solid fa-circle"; // Tukar kepada ikon bulatan rakaman
+      micIcon.className = "fa-solid fa-circle"; 
     } else {
       voiceBtn.classList.remove("recording");
-      micIcon.className = "fa-solid fa-microphone"; // Kembali ke ikon mikrofon
+      micIcon.className = "fa-solid fa-microphone"; 
     }
   }
 }
 
+/* TYPING INDICATOR FUNCTIONS */
+async function setTypingStatus(isTyping) {
+  if (!user || !username) return;
+  try {
+    await setDoc(doc(db, "typing", "global_status"), {
+      [user.uid]: {
+        typing: isTyping,
+        name: username,
+        timestamp: Date.now()
+      }
+    }, { merge: true });
+  } catch (e) { console.error("Error setting typing status:", e); }
+}
+
+function listenToTyping() {
+  onSnapshot(doc(db, "typing", "global_status"), (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      let typingUsers = [];
+      const now = Date.now();
+      
+      for (let uid in data) {
+        if (user && uid !== user.uid && data[uid].typing && (now - data[uid].timestamp < 5000)) {
+          typingUsers.push(data[uid].name);
+        }
+      }
+      
+      if (typingUsers.length > 0) {
+        typingStatusEl.innerText = typingUsers.join(", ") + " sedang mengetik...";
+        typingStatusEl.style.color = "#d1f4cc";
+      } else {
+        typingStatusEl.innerText = currentGlobalStatusText;
+        typingStatusEl.style.color = currentGlobalStatusColor;
+      }
+    }
+  });
+}
+
+/* ONLINE & LAST SEEN FUNCTIONS */
+async function updateOnlineStatus(statusVal) {
+  if (!user || !username) return;
+  try {
+    await setDoc(doc(db, "status", user.uid), {
+      state: statusVal,
+      last_changed: serverTimestamp(),
+      name: username
+    }, { merge: true });
+  } catch (e) { console.error("Gagal update status:", e); }
+}
+
+window.addEventListener('beforeunload', () => updateOnlineStatus('offline'));
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    updateOnlineStatus('online');
+  } else {
+    updateOnlineStatus('offline');
+  }
+});
+
+function listenToUserStatus() {
+  const statusRef = collection(db, "status");
+  onSnapshot(statusRef, (snapshot) => {
+    snapshot.docChanges().forEach((change) => {
+      const data = change.doc.data();
+      const userId = change.doc.id;
+
+      if (user && userId !== user.uid) {
+        renderStatusHeader(data);
+      }
+    });
+  });
+}
+
+function renderStatusHeader(data) {
+  if (data.state === 'online') {
+    currentGlobalStatusText = `${data.name || 'User'} Online`;
+    currentGlobalStatusColor = "#d1f4cc";
+  } else {
+    const waktu = data.last_changed ? formatTime(data.last_changed) : "";
+    currentGlobalStatusText = `${data.name || 'User'} terakhir dilihat pukul ${waktu}`;
+    currentGlobalStatusColor = "#ccc";
+  }
+  
+  if (!typingStatusEl.innerText.includes("sedang mengetik")) {
+    typingStatusEl.innerText = currentGlobalStatusText;
+    typingStatusEl.style.color = currentGlobalStatusColor;
+  }
+}
+
 /* FUNGSI BUBBLE LOGIN */
-function createLoginBubble(user, type = 'login', timestamp = null) {
+function createLoginBubble(userNameStr, type = 'login', timestamp = null) {
   const now = (timestamp && (timestamp instanceof Date || (timestamp.toDate && typeof timestamp.toDate === 'function'))) 
     ? (timestamp instanceof Date ? timestamp : timestamp.toDate()) : new Date();
   
-  const messageId = `login-${user.replace(/\s+/g, '-')}`;
+  const messageId = `login-${userNameStr.replace(/\s+/g, '-')}`;
   const existingBubble = document.getElementById(messageId);
   
   if (existingBubble) {
@@ -1093,7 +1189,7 @@ function createLoginBubble(user, type = 'login', timestamp = null) {
     const timeText = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: '2-digit' }) + ' ' + 
                      now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
     const statusText = type === 'login' ? 'telah login' : 'telah logout';
-    existingBubble.innerHTML = `<span class="user-name">${user}</span> <span class="status-text">${statusText}</span><span class="timestamp">${timeText}</span>`;
+    existingBubble.innerHTML = `<span class="user-name">${userNameStr}</span> <span class="status-text">${statusText}</span><span class="timestamp">${timeText}</span>`;
     existingBubble.className = `status-pesan ${type}`;
     existingBubble.style.animation = 'none';
     setTimeout(() => { existingBubble.style.animation = 'fadeInUp 0.3s ease'; }, 10);
@@ -1102,11 +1198,11 @@ function createLoginBubble(user, type = 'login', timestamp = null) {
   
   const bubble = document.createElement("div");
   bubble.className = `status-pesan ${type}`;
-  bubble.id = messageId; bubble.dataset.user = user; bubble.dataset.type = type; bubble.dataset.timestamp = now.getTime();
+  bubble.id = messageId; bubble.dataset.user = userNameStr; bubble.dataset.type = type; bubble.dataset.timestamp = now.getTime();
   const timeText = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: '2-digit' }) + ' ' + 
                    now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
   const statusText = type === 'login' ? 'telah login' : 'telah logout';
-  bubble.innerHTML = `<span class="user-name">${user}</span> <span class="status-text">${statusText}</span><span class="timestamp">${timeText}</span>`;
+  bubble.innerHTML = `<span class="user-name">${userNameStr}</span> <span class="status-text">${statusText}</span><span class="timestamp">${timeText}</span>`;
   return bubble;
 }
 
@@ -1125,8 +1221,8 @@ async function saveLoginToFirestore(type = 'login') {
   } catch (error) { console.error(`Error menyimpan ${type}:`, error); }
 }
 
-function renderLoginMessage(doc) {
-  const data = doc.data();
+function renderLoginMessage(docSnap) {
+  const data = docSnap.data();
   if (data.user === username) return;
   const bubble = createLoginBubble(data.user, data.type, data.waktu);
   if (!bubble) return;
@@ -1137,9 +1233,9 @@ function renderLoginMessage(doc) {
   const existingLoginBubbles = chatBox.querySelectorAll('.status-pesan');
   if (existingLoginBubbles.length >= 5) {
     let oldestBubble = null, oldestTime = Infinity;
-    existingLoginBubbles.forEach(bubble => {
-      const timestamp = parseInt(bubble.dataset.timestamp);
-      if (timestamp < oldestTime) { oldestTime = timestamp; oldestBubble = bubble; }
+    existingLoginBubbles.forEach(b => {
+      const timestamp = parseInt(b.dataset.timestamp);
+      if (timestamp < oldestTime) { oldestTime = timestamp; oldestBubble = b; }
     });
     if (oldestBubble) oldestBubble.remove();
   }
@@ -1154,9 +1250,9 @@ function listenLogins() {
     const existingBubbles = chatBox.querySelectorAll('.status-pesan');
     existingBubbles.forEach(bubble => bubble.remove());
     const userStatusMap = new Map();
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      if (!userStatusMap.has(data.user) && data.user !== username) { userStatusMap.set(data.user, { data, doc }); }
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      if (!userStatusMap.has(data.user) && data.user !== username) { userStatusMap.set(data.user, { data, doc: docSnap }); }
     });
     let count = 0;
     userStatusMap.forEach((value) => { if (count < 5) { renderLoginMessage(value.doc); count++; } });
@@ -1241,7 +1337,7 @@ async function processAndSendRecording(duration) {
     const file = new File([audioBlob], `voice_${Date.now()}.${ext}`, { type: mimeType });
     const voiceFile = await uploadToSupabase(file);
     const messageData = {
-      user: username, waktu: serverTimestamp(), edited: false,
+      user: username, waktu: serverTimestamp(), edited: false, readBy: [username],
       files: [voiceFile], isVoiceMessage: true, voiceDuration: Math.floor(duration), teks: ""
     };
     if (replyData) { messageData.reply = replyData; replyData = null; replyBar.style.display = "none"; }
@@ -1297,7 +1393,7 @@ function showUploadPreview() {
   filesToUpload.forEach((file, index) => {
     const previewDiv = document.createElement('div');
     previewDiv.className = 'preview-item';
-    previewDiv.id = `preview-file-${index}`; // ID unik untuk akses nanti
+    previewDiv.id = `preview-file-${index}`; 
     
     let icon = '📄';
     let compressOption = '';
@@ -1307,7 +1403,6 @@ function showUploadPreview() {
       compressOption = `<label style="font-size: 11px; margin-right: 10px; display: flex; align-items: center; gap: 4px; cursor: pointer; color: #128c7e; font-weight: bold;"><input type="checkbox" class="compress-check" data-index="${index}" checked> Kompres</label>`;
     } else if(file.type.startsWith('video/')) { icon = '🎬'; }
     
-    // HTML Structure diperbarui dengan Progress Container
     previewDiv.innerHTML = `
       <div style="width: 100%;">
         <div style="display: flex; align-items: center; justify-content: space-between;">
@@ -1348,14 +1443,22 @@ async function uploadToSupabase(file) {
 }
 
 /* AUTH */
-onAuthStateChanged(auth,async user=>{
-  if(!user){ if(!window.location.href.includes('mygroups.html')) location.href="mygrups.html"; return; }
+onAuthStateChanged(auth, async u => {
+  if(!u){ 
+    if(!window.location.href.includes('mygroups.html')) location.href="mygroups.html"; 
+    return; 
+  }
+  user = u;
   try{
     const snap=await getDoc(doc(db,"usernames",user.uid));
     username=snap.exists()?snap.data().username:"Anonim";
     document.getElementById("user-info").textContent=`${username}`;
     await saveLoginToFirestore('login');
-    listenChat(); listenLogins();
+    updateOnlineStatus('online');
+    listenChat(); 
+    listenLogins();
+    listenToTyping();
+    listenToUserStatus();
   }catch(error){ console.error("Auth error:", error); }
 });
 
@@ -1421,16 +1524,13 @@ function listenChat() {
     const loadingEl = chatBox.querySelector('.loading'); 
     if (loadingEl) loadingEl.remove();
 
-    // Cek posisi sebelum render
     const isAtBottom = (chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight) < 100;
 
-    // Hitung pesan baru jika user sedang scroll ke atas
     if (!isFirstLoad) {
       s.docChanges().forEach(change => {
         if (change.type === "added") {
           const data = change.doc.data();
-          // Hanya tambah angka jika user sedang di atas dan itu bukan pesan miliknya sendiri
-          if (!isAtBottom) {
+          if (!isAtBottom && data.user !== username) {
             unreadCount++;
           }
         }
@@ -1439,7 +1539,6 @@ function listenChat() {
 
     if (!s.empty && isFirstLoad) { lastVisible = s.docs[0]; }
 
-    // Render pesan
     const spinner = document.getElementById("load-more-spinner");
     const oldMessages = Array.from(chatBox.querySelectorAll('.pesan')).filter(el => { 
       return !s.docs.some(doc => "msg-" + doc.id === el.id); 
@@ -1454,7 +1553,6 @@ function listenChat() {
       chatBox.appendChild(el); 
     });
 
-    // Jalankan Auto-Scroll atau update UI tombol
     if (isFirstLoad) { 
       chatBox.scrollTop = chatBox.scrollHeight; 
       isFirstLoad = false; 
@@ -1467,15 +1565,12 @@ function listenChat() {
   });
 }
 
-
-// Fungsi memperbarui tampilan tombol
 function updateScrollButtonUI() {
-  // Anggap di bawah jika jarak ke dasar < 100px
   const isAtBottom = (chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight) < 100;
 
   if (isAtBottom) {
     scrollBottomBtn.style.display = "none";
-    unreadCount = 0; // Reset angka saat sudah sampai bawah
+    unreadCount = 0; 
     unreadBadge.style.display = "none";
   } else {
     scrollBottomBtn.style.display = "flex";
@@ -1488,31 +1583,25 @@ function updateScrollButtonUI() {
   }
 }
 
-// --- 3. Fungsi Klik Scroll ke Bawah ---
 window.scrollToBottom = () => {
   chatBox.scrollTo({ top: chatBox.scrollHeight, behavior: 'smooth' });
 };
 
-// Fungsi reset counter
 function resetUnread() {
   unreadCount = 0;
   scrollBottomBtn.style.display = "none";
   unreadBadge.style.display = "none";
 }
 
-// Pantau scroll manual user
 chatBox.addEventListener("scroll", () => {
-  // Logika load more (yang sudah ada)
   if (chatBox.scrollTop === 0 && !isLoadingMore && !reachedEnd) { 
     loadMoreMessages(); 
   }
-  
-  // Update kemunculan tombol saat scroll
   updateScrollButtonUI();
 });
 
 function renderMessage(d) {
-  const data = d.id ? d.data() : d; // Antisipasi jika d adalah doc atau data mentah
+  const data = d.id ? d.data() : d; 
   const isMe = data.user === username;
   const msgId = d.id || "";
   const msgDiv = document.createElement("div");
@@ -1520,7 +1609,6 @@ function renderMessage(d) {
   msgDiv.id = "msg-" + msgId;
   msgDiv.dataset.timestamp = data.waktu?.toDate ? data.waktu.toDate().getTime() : Date.now();
 
-  // Listener Real-time untuk perubahan teks (edit)
   onSnapshot(doc(db, "pesan", msgId), (updatedDoc) => {
     if (!updatedDoc.exists()) {
       msgDiv.remove();
@@ -1529,8 +1617,7 @@ function renderMessage(d) {
     const updatedData = updatedDoc.data();
     const textEl = msgDiv.querySelector(".msg");
     if (textEl && updatedData.teks !== textEl.textContent) {
-      textEl.textContent = updatedData.teks;
-      // Tambahkan penanda "diedit" jika belum ada
+      textEl.innerHTML = linkify(sanitize(updatedData.teks));
       if (updatedData.edited && !msgDiv.querySelector('.edited-label')) {
          const timeSpan = msgDiv.querySelector('.timestamp');
          if(timeSpan) timeSpan.innerHTML = '<i class="fa-solid fa-pencil" style="font-size:10px; margin-right:4px;"></i>' + timeSpan.innerHTML;
@@ -1538,29 +1625,24 @@ function renderMessage(d) {
     }
   });
 
-// --- REPLY SECTION ---
-if (data.reply) {
-  const replyDiv = document.createElement("div");
-  replyDiv.className = "reply-preview";
-  replyDiv.innerHTML = `<small>${data.reply.user}</small><span>${data.reply.text}</span>`;
-  
-  // PERBAIKAN: Gunakan fungsi scrollToMessage yang sudah ada logika load-more & animasi
-  replyDiv.onclick = () => {
-    scrollToMessage(data.reply.id); 
-  };
-  
-  msgDiv.appendChild(replyDiv);
-}
+  if (data.reply) {
+    const replyDiv = document.createElement("div");
+    replyDiv.className = "reply-preview";
+    replyDiv.innerHTML = `<small>${data.reply.user}</small><span>${data.reply.text}</span>`;
+    
+    replyDiv.onclick = () => {
+      scrollToMessage(data.reply.id); 
+    };
+    
+    msgDiv.appendChild(replyDiv);
+  }
 
-  // --- FILE SECTION ---
   if (data.files && data.files.length > 0) {
     const fileContainer = document.createElement("div");
     fileContainer.className = "file-container";
     
     data.files.forEach(file => {
       if (file.type.startsWith('audio/')) {
-        // --- LOGIKA VOICE NOTE --- 
-        // (Menggunakan struktur waveform seperti WA)
         const voiceDiv = document.createElement("div");
         voiceDiv.className = "voice-message";
         
@@ -1568,22 +1650,18 @@ if (data.reply) {
         playBtn.className = "voice-play-btn";
         playBtn.innerHTML = '<i class="fa-solid fa-play play-icon"></i>';
         
-        // Buat Waveform Visual
         const { container: waveContainer, progressOverlay, waveform, progressIndicator, bars } = createWhatsAppVoiceWaveform(isMe, file.voiceDuration || 0);
         
         const durationDiv = document.createElement("div");
         durationDiv.className = "voice-duration";
         durationDiv.textContent = formatVoiceDuration(file.voiceDuration || 0);
 
-        // Audio Element (Hidden)
         const audio = new Audio(file.url);
         audio.preload = "metadata";
 
-        // Event Klik Play/Pause
         let cleanupAnimation = null;
         playBtn.onclick = () => {
           if (audio.paused) {
-            // Stop audio lain yg sedang main
             document.querySelectorAll('audio').forEach(a => { if(a !== audio) { a.pause(); a.currentTime = 0; } });
             document.querySelectorAll('.voice-play-btn').forEach(b => { 
                 b.innerHTML = '<i class="fa-solid fa-play play-icon"></i>'; 
@@ -1606,7 +1684,6 @@ if (data.reply) {
           playBtn.classList.remove("playing");
           playBtn.innerHTML = '<i class="fa-solid fa-play play-icon"></i>';
           if (cleanupAnimation) cleanupAnimation();
-          // Reset visual
           progressOverlay.style.width = '0%';
           progressIndicator.style.display = 'none';
           Array.from(bars).forEach(bar => bar.classList.remove('active'));
@@ -1622,7 +1699,6 @@ if (data.reply) {
         fileContainer.appendChild(voiceDiv);
 
       } else {
-        // --- LOGIKA GAMBAR / VIDEO / DOKUMEN ---
         const filePreview = document.createElement("div");
         filePreview.className = "file-preview";
         
@@ -1634,18 +1710,15 @@ if (data.reply) {
           mediaTag.src = file.url;
         } else if (file.type.startsWith('video/')) {
           mediaTag = document.createElement("video");
-          mediaTag.preload = "metadata"; // Agar hemat data
-          mediaTag.src = file.url + "#t=0.1"; // Hack untuk menampilkan frame pertama
+          mediaTag.preload = "metadata"; 
+          mediaTag.src = file.url + "#t=0.1"; 
 
-          // --- BARU: Buat Ikon Play Overlay ---
           iconOverlay = document.createElement("div");
           iconOverlay.className = "video-chat-play";
           iconOverlay.innerHTML = '<i class="fas fa-play"></i>';
-          // ------------------------------------
         }
 
         if (mediaTag) {
-          // Setup properties umum untuk media (img/video)
           mediaTag.classList.add("previewable");
           mediaTag.dataset.url = file.url;
           mediaTag.dataset.type = file.type.startsWith('image/') ? 'image' : 'video';
@@ -1653,15 +1726,13 @@ if (data.reply) {
           mediaTag.dataset.msgId = msgId;
           mediaTag.dataset.filePaths = JSON.stringify(data.files.map(f => f.path));
           
-          // Event klik untuk membuka preview fullscreen
           const openPreview = () => showPreview(file.url, mediaTag.dataset.type, data.user, msgId, data.files.map(f => f.path));
           
           mediaTag.onclick = openPreview;
-          if (iconOverlay) iconOverlay.onclick = openPreview; // Klik ikon juga buka preview
+          if (iconOverlay) iconOverlay.onclick = openPreview; 
 
           filePreview.appendChild(mediaTag);
           
-          // Jika ada ikon overlay (video), masukkan ke container
           if (iconOverlay) {
              filePreview.appendChild(iconOverlay);
           }
@@ -1672,7 +1743,6 @@ if (data.reply) {
           filePreview.appendChild(fileInfo);
           fileContainer.appendChild(filePreview);
         } else {
-          // Dokumen Biasa
           const docInfo = document.createElement("div");
           docInfo.className = "file-info";
           docInfo.innerHTML = `<div>📄 ${file.name}</div><a href="${file.url}" class="file-download" target="_blank">Unduh (${formatFileSize(file.size)})</a>`;
@@ -1683,22 +1753,19 @@ if (data.reply) {
     msgDiv.appendChild(fileContainer);
   }
 
-  // --- TEXT SECTION ---
   if (data.teks) {
     const textEl = document.createElement("div");
     textEl.className = "msg";
-    textEl.textContent = data.teks;
+    textEl.innerHTML = linkify(sanitize(data.teks));
     msgDiv.appendChild(textEl);
   }
 
-  // --- STATUS INFO (Waktu & Centang) ---
   const statusContainer = document.createElement("div");
   statusContainer.className = "status-container";
   
-  // Tanda Edit
   if (data.edited) {
      const editedText = document.createElement("span");
-     editedText.className = "edited"; // Mengambil style dari CSS .edited Anda
+     editedText.className = "edited"; 
      editedText.textContent = "(diedit)";
      statusContainer.appendChild(editedText);
   }
@@ -1711,108 +1778,134 @@ if (data.reply) {
   if (isMe) {
     const readStatus = document.createElement("span");
     readStatus.className = "status-read";
-    const isRead = data.readBy && data.readBy.length > 1; // Dibaca jika array readBy > 1 (ada user lain)
+    const isRead = data.readBy && data.readBy.length > 1; 
     readStatus.innerHTML = isRead ? '<i class="fa-solid fa-check-double"></i>' : '<i class="fa-solid fa-check"></i>';
     readStatus.classList.add(isRead ? 'centang-biru' : 'centang-abu');
     statusContainer.appendChild(readStatus);
   }
   msgDiv.appendChild(statusContainer);
 
-  // --- LOGIKA READ RECEIPT (Untuk Lawan) ---
   if (!isMe && data.readBy && !data.readBy.includes(username)) {
-    // Update firestore bahwa kita sudah baca
     updateDoc(doc(db, "pesan", d.id), {
       readBy: [...data.readBy, username]
     }).catch(err => console.log("Gagal update read status", err));
   }
 
-  // --- MENU BUBBLE (Context Menu) ---
+  /* --- MENU BUBBLE DENGAN TOMBOL SALIN (JIKA ADA LINK) --- */
   const menu = document.createElement("div");
   menu.className = "bubble-menu " + (isMe ? "outside" : "inside");
-  menu.innerHTML = isMe ? 
-    `<button title="Balas"><i class="fa-solid fa-reply"></i></button>
-     <button title="Edit"><i class="fa-solid fa-pen"></i></button>
-     <button title="Hapus"><i class="fa-solid fa-trash"></i></button>` : 
-    `<button title="Balas"><i class="fa-solid fa-reply"></i></button>`;
   
-  // 1. Tombol Balas
-  menu.children[0].onclick = () => {
-    const replyPreviewText = data.files && data.files.length > 0 
-        ? (data.files[0].type.startsWith('image') ? '📷 Foto' : (data.files[0].type.startsWith('video') ? '🎥 Video' : '📄 File')) 
-        : data.teks || '[File]';
-    
-    replyData = { user: data.user, text: replyPreviewText, id: d.id };
-    replyText.textContent = `${data.user}: ${replyPreviewText}`;
-    replyBar.style.display = "flex";
-    closeMenus();
-    input.focus();
-  };
-
-  if(isMe){
-    // 2. Tombol Edit
-    menu.children[1].onclick = async () => {
-      closeMenus();
-      const msgElement = msgDiv.querySelector(".msg");
-      if (!msgElement) return; // Tidak bisa edit jika hanya file tanpa teks
+  const hasLink = data.teks && /https?:\/\/[^\s]+/i.test(data.teks);
+  
+  let menuHTML = `<button class="btn-reply" title="Balas"><i class="fa-solid fa-reply"></i></button>`;
+  if (hasLink) {
+    menuHTML += `<button class="btn-copy" title="Salin Tautan"><i class="fa-solid fa-copy"></i></button>`;
+  }
+  if (isMe) {
+    menuHTML += `<button class="btn-edit" title="Edit"><i class="fa-solid fa-pen"></i></button>
+                 <button class="btn-delete" title="Hapus"><i class="fa-solid fa-trash"></i></button>`;
+  }
+  menu.innerHTML = menuHTML;
+  
+  const btnReply = menu.querySelector('.btn-reply');
+  if(btnReply) {
+    btnReply.onclick = () => {
+      const replyPreviewText = data.files && data.files.length > 0 
+          ? (data.files[0].type.startsWith('image') ? '📷 Foto' : (data.files[0].type.startsWith('video') ? '🎥 Video' : '📄 File')) 
+          : data.teks || '[File]';
       
-      const originalText = msgElement.textContent;
-      msgElement.contentEditable = true;
-      msgElement.focus();
-      msgElement.classList.add("editing-active");
-
-      // Fungsi simpan edit
-      const saveEdit = async () => {
-        if (msgElement.contentEditable !== "true") return;
-        const newText = msgElement.textContent.trim();
-        msgElement.contentEditable = false;
-        msgElement.classList.remove("editing-active");
-        
-        if (newText !== "" && newText !== originalText) {
-          try {
-            await updateDoc(doc(db, "pesan", d.id), {
-              teks: newText,
-              edited: true
-            });
-          } catch (error) {
-            console.error("Gagal edit:", error);
-            msgElement.textContent = originalText;
-            alert("Gagal mengedit pesan");
-          }
-        } else {
-          msgElement.textContent = originalText;
-        }
-      };
-
-      msgElement.onblur = saveEdit;
-      msgElement.onkeydown = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
-          saveEdit();
-        }
-      };
-    };
-
-    // 3. Tombol Hapus
-    menu.children[2].onclick = async () => {
+      replyData = { user: data.user, text: replyPreviewText, id: d.id };
+      replyText.textContent = `${data.user}: ${replyPreviewText}`;
+      replyBar.style.display = "flex";
       closeMenus();
-      if (confirm("Hapus pesan ini untuk semua orang?")) {
-        try {
-          // Hapus file dari Storage Supabase jika ada
-          if (data.files && data.files.length > 0) {
-            const paths = data.files.map(f => f.path);
-            await supabase.storage.from('chat-storage').remove(paths);
-          }
-          // Hapus dokumen dari Firestore
-          await deleteDoc(doc(db, "pesan", d.id));
-        } catch (error) {
-          console.error("Gagal hapus:", error);
-          alert("Gagal menghapus pesan");
-        }
-      }
+      input.focus();
     };
   }
 
-  // Event handler untuk menampilkan menu (Klik Kanan & Klik Kiri)
+  const btnCopy = menu.querySelector('.btn-copy');
+  if (hasLink && btnCopy) {
+    btnCopy.onclick = () => {
+      const links = data.teks.match(/https?:\/\/[^\s]+/ig);
+      const linkToCopy = links ? links[0] : data.teks;
+      navigator.clipboard.writeText(linkToCopy).then(() => {
+        btnCopy.innerHTML = '<i class="fa-solid fa-check" style="color: #25D366;"></i>';
+        setTimeout(() => {
+          btnCopy.innerHTML = '<i class="fa-solid fa-copy"></i>';
+          closeMenus();
+        }, 1000);
+      }).catch(() => {
+        alert("Gagal menyalin tautan");
+        closeMenus();
+      });
+    };
+  }
+
+  if(isMe){
+    const btnEdit = menu.querySelector('.btn-edit');
+    if(btnEdit) {
+      btnEdit.onclick = async () => {
+        closeMenus();
+        const msgElement = msgDiv.querySelector(".msg");
+        if (!msgElement) return; 
+        
+        const originalText = msgElement.textContent;
+        msgElement.textContent = originalText; 
+        msgElement.contentEditable = true;
+        msgElement.focus();
+        msgElement.classList.add("editing-active");
+
+        const saveEdit = async () => {
+          if (msgElement.contentEditable !== "true") return;
+          const newText = msgElement.textContent.trim();
+          msgElement.contentEditable = false;
+          msgElement.classList.remove("editing-active");
+          
+          if (newText !== "" && newText !== originalText) {
+            try {
+              await updateDoc(doc(db, "pesan", d.id), {
+                teks: newText,
+                edited: true
+              });
+            } catch (error) {
+              console.error("Gagal edit:", error);
+              msgElement.innerHTML = linkify(sanitize(originalText));
+              alert("Gagal mengedit pesan");
+            }
+          } else {
+            msgElement.innerHTML = linkify(sanitize(originalText));
+          }
+        };
+
+        msgElement.onblur = saveEdit;
+        msgElement.onkeydown = (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            saveEdit();
+          }
+        };
+      };
+    }
+
+    const btnDelete = menu.querySelector('.btn-delete');
+    if(btnDelete) {
+      btnDelete.onclick = async () => {
+        closeMenus();
+        if (confirm("Hapus pesan ini untuk semua orang?")) {
+          try {
+            if (data.files && data.files.length > 0) {
+              const paths = data.files.map(f => f.path);
+              await supabase.storage.from('chat-storage').remove(paths);
+            }
+            await deleteDoc(doc(db, "pesan", d.id));
+          } catch (error) {
+            console.error("Gagal hapus:", error);
+            alert("Gagal menghapus pesan");
+          }
+        }
+      };
+    }
+  }
+
   msgDiv.oncontextmenu = (e) => {
     e.preventDefault();
     closeMenus();
@@ -1821,7 +1914,6 @@ if (data.reply) {
   };
 
   msgDiv.onclick = (e) => {
-    // Jika sedang klik tombol play audio/video, jangan buka menu
     if(e.target.closest('.voice-play-btn') || e.target.closest('.previewable') || e.target.closest('.video-chat-play')) return;
 
     if (menu.style.display === "flex") {
@@ -1851,15 +1943,12 @@ async function scrollToMessage(id) {
 window.showPreview = function(url, type, sender, messageId, filePaths) {
   const modal = document.getElementById("preview-modal");
   
-  // Tentukan context: sedang buka dari Galeri atau Chat Box?
   const isGallery = document.getElementById("gallery-modal").style.display === "flex" || 
                     document.getElementById("gallery-modal").style.display === "block";
   const containerId = isGallery ? "gallery-grid" : "chat-box";
   
-  // Ambil semua elemen media yang bisa di-preview di container tersebut
   const elements = Array.from(document.getElementById(containerId).querySelectorAll(".previewable, .file-preview img, .file-preview video, .gallery-item img, .gallery-item video"));
   
-  // Bangun daftar file untuk navigasi
   previewFiles = elements.map(el => ({
     url: el.dataset.url || el.src,
     type: el.dataset.type || (el.tagName.toLowerCase() === 'img' ? 'image' : 'video'),
@@ -1868,7 +1957,6 @@ window.showPreview = function(url, type, sender, messageId, filePaths) {
     filePaths: el.dataset.filePaths ? JSON.parse(el.dataset.filePaths) : (Array.isArray(filePaths) ? filePaths : [])
   }));
 
-  // Cari index file yang diklik
   currentPreviewIndex = previewFiles.findIndex(f => f.url === url);
   if (currentPreviewIndex === -1) {
     previewFiles = [{ url, type, sender, messageId, filePaths }];
@@ -1879,7 +1967,6 @@ window.showPreview = function(url, type, sender, messageId, filePaths) {
   modal.style.display = "flex";
 };
 
-// Fungsi untuk merender konten modal berdasarkan index saat ini
 function renderCurrentPreview() {
   const file = previewFiles[currentPreviewIndex];
   if (!file) return;
@@ -1889,12 +1976,10 @@ function renderCurrentPreview() {
   const prevBtn = document.getElementById("prev-preview");
   const nextBtn = document.getElementById("next-preview");
 
-  // Render Media
   content.innerHTML = file.type === 'image' 
     ? `<img src="${file.url}">` 
     : `<video src="${file.url}" controls autoplay></video>`;
 
-  // Update Tombol Hapus (Hanya jika kita pemilik pesan)
   if (file.sender === username && file.messageId) {
     deleteBtn.style.display = "flex";
     deleteBtn.onclick = async (e) => {
@@ -1913,12 +1998,10 @@ function renderCurrentPreview() {
     deleteBtn.style.display = "none";
   }
 
-  // Update Visibilitas Tombol Navigasi
   prevBtn.classList.toggle("hidden", currentPreviewIndex <= 0);
   nextBtn.classList.toggle("hidden", currentPreviewIndex >= previewFiles.length - 1);
 }
 
-// Fungsi navigasi Klik
 window.navigatePreview = function(direction) {
   const newIndex = currentPreviewIndex + direction;
   if (newIndex >= 0 && newIndex < previewFiles.length) {
@@ -1927,7 +2010,6 @@ window.navigatePreview = function(direction) {
   }
 };
 
-// Tambahan: Navigasi menggunakan Keyboard (Panah Kiri/Kanan)
 document.addEventListener('keydown', (e) => {
   if (document.getElementById("preview-modal").style.display === "flex") {
     if (e.key === "ArrowLeft") navigatePreview(-1);
@@ -1940,16 +2022,15 @@ window.closePreview = function() {
   const modal = document.getElementById("preview-modal");
   const previewContent = document.getElementById("preview-content");
 
-  // Cari video yang sedang putar
   const video = previewContent.querySelector("video");
   if (video) {
-    video.pause();      // Hentikan suara
-    video.src = "";     // Kosongkan resource
+    video.pause();      
+    video.src = "";     
     video.load();
   }
 
-  previewContent.innerHTML = ""; // Bersihkan HTML
-  modal.style.display = "none";  // Sembunyikan modal
+  previewContent.innerHTML = ""; 
+  modal.style.display = "none";  
 };
 
 function closeMenus(){
@@ -1957,24 +2038,31 @@ function closeMenus(){
 }
 document.addEventListener("click", closeMenus);
 
-input.addEventListener("input", function() { autoResizeTextarea(this); updateSend(); });
+// Event Listener Input untuk Typing Status
+input.addEventListener("input", function() { 
+  autoResizeTextarea(this); 
+  updateSend(); 
+  
+  setTypingStatus(true);
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => setTypingStatus(false), 3000);
+});
 
 window.kirim = async () => {
-  // 1. Cek validasi dasar
   if (isSending) return;
   const text = input.value.trim();
   const hasFiles = filesToUpload.length > 0;
   if (!text && !hasFiles) return;
 
-  // 2. Kunci UI (State Sending)
   isSending = true;
-  updateSend(); // Update ikon tombol
-  const originalBtnContent = sendBtn.innerHTML;
-  sendBtn.innerHTML = '<span style="font-size:14px">⌛</span>'; // Ikon loading
-  sendBtn.disabled = true;
-  input.disabled = true; // Kunci input text agar tidak diedit saat upload
+  updateSend(); 
+  setTypingStatus(false); // Hilangkan status saat mulai mengirim
 
-  // Ambil referensi data sebelum diproses
+  const originalBtnContent = sendBtn.innerHTML;
+  sendBtn.innerHTML = '<span style="font-size:14px">⌛</span>'; 
+  sendBtn.disabled = true;
+  input.disabled = true; 
+
   const compressCheckboxes = document.querySelectorAll('.compress-check');
   const messageText = text;
   const currentReply = replyData;
@@ -1982,27 +2070,22 @@ window.kirim = async () => {
   let uploadedFiles = [];
 
   try {
-    // 3. Proses Upload File (Jika Ada)
     if (hasFiles) {
-      // Sembunyikan tombol hapus (X) agar user tidak membatalkan di tengah jalan
       document.querySelectorAll('.preview-remove').forEach(el => el.style.display = 'none');
       document.querySelectorAll('.compress-check').forEach(el => el.disabled = true);
 
-      // Loop setiap file
       for (let i = 0; i < currentFiles.length; i++) {
         let fileToProcess = currentFiles[i];
         
-        // Ambil elemen progress bar
         const progressContainer = document.getElementById(`progress-container-${i}`);
         const progressBar = document.getElementById(`progress-bar-${i}`);
         
         if (progressContainer && progressBar) {
-          progressContainer.style.display = 'block'; // Munculkan bar
-          progressBar.style.width = '10%'; // Mulai sedikit
+          progressContainer.style.display = 'block'; 
+          progressBar.style.width = '10%'; 
           progressBar.classList.add('processing');
         }
 
-        // Simulasi Progress (Interval) karena Supabase basic upload tidak ada onProgress
         let progress = 10;
         const progressInterval = setInterval(() => {
           if (progress < 90) {
@@ -2011,40 +2094,34 @@ window.kirim = async () => {
           }
         }, 200);
 
-        // -- Proses Kompresi --
         if (fileToProcess.type.startsWith('image/')) {
           const checkEl = Array.from(compressCheckboxes).find(c => parseInt(c.dataset.index) === i);
           if (!checkEl || checkEl.checked) {
-            // Update status visual jika sedang kompres
             fileToProcess = await compressImage(fileToProcess);
           }
         }
 
         try {
-          // -- Proses Upload ke Supabase --
           const fileData = await uploadToSupabase(fileToProcess);
           uploadedFiles.push(fileData);
           
-          // Upload Selesai: Set bar ke 100%
           clearInterval(progressInterval);
           if (progressBar) {
             progressBar.style.width = '100%';
             progressBar.classList.remove('processing');
-            progressBar.style.backgroundColor = '#25D366'; // Hijau terang sukses
+            progressBar.style.backgroundColor = '#25D366'; 
           }
         } catch (error) {
           console.error("Gagal upload file:", fileToProcess.name, error);
           clearInterval(progressInterval);
           if (progressBar) {
             progressBar.style.width = '100%';
-            progressBar.style.backgroundColor = '#ff4444'; // Merah error
+            progressBar.style.backgroundColor = '#ff4444'; 
           }
-          // Kita lanjut ke file berikutnya meski satu gagal (opsional: bisa throw error)
         }
       }
     }
 
-    // 4. Kirim Data ke Firestore (Metadata Pesan)
     const messageData = {
       user: username,
       waktu: serverTimestamp(),
@@ -2054,33 +2131,28 @@ window.kirim = async () => {
 
     if (messageText) messageData.teks = sanitize(messageText);
     if (currentReply) messageData.reply = currentReply;
-    if (uploadedFiles.length > 0) messageData.files = uploadedFiles; // Masukkan file yang berhasil
+    if (uploadedFiles.length > 0) messageData.files = uploadedFiles; 
 
     await addDoc(collection(db, "pesan"), messageData);
     
-    // Scroll ke bawah
     setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 100);
 
-    // 5. Reset UI Total (Sukses)
     input.value = "";
     replyData = null;
     replyBar.style.display = "none";
-    filesToUpload = []; // Kosongkan array file
+    filesToUpload = []; 
     uploadPreview.style.display = "none";
     uploadPreview.innerHTML = "";
     input.style.height = "auto";
 
   } catch (error) {
-    // 6. Error Handling Global
     console.error("Send error:", error);
     alert("Gagal mengirim pesan. Silakan coba lagi.");
     
-    // Kembalikan UI ke keadaan sebelum kirim agar user bisa retry
     document.querySelectorAll('.preview-remove').forEach(el => el.style.display = 'block');
     document.querySelectorAll('.compress-check').forEach(el => el.disabled = false);
     
   } finally {
-    // 7. Bersihkan State Tombol
     isSending = false;
     input.disabled = false;
     sendBtn.innerHTML = originalBtnContent;
@@ -2098,14 +2170,11 @@ window.logout = async () => {
   if (confirm("Apakah Anda yakin ingin logout?")) {
     try {
       logoutBtn.disabled = true; logoutBtn.innerHTML = "⌛";
+      await updateOnlineStatus('offline');
       await saveLoginToFirestore('logout'); setTimeout(async () => { await signOut(auth); }, 1000);
     } catch (error) { alert("Gagal logout."); logoutBtn.disabled = false; logoutBtn.innerHTML = "⎋"; }
   }
 };
-
-chatBox.addEventListener("scroll", () => {
-  if (chatBox.scrollTop === 0 && !isLoadingMore && !reachedEnd) { loadMoreMessages(); }
-});
 
 async function loadMoreMessages() {
   if (isLoadingMore || reachedEnd || !lastVisible) return;
@@ -2130,18 +2199,16 @@ let currentGalleryTab = 'all';
 
 window.switchGalleryTab = function(tab) {
   currentGalleryTab = tab;
-  // Update UI Tab Aktif
   document.querySelectorAll('.g-tab').forEach(el => {
     el.classList.remove('active');
     if(el.getAttribute('onclick').includes(`'${tab}'`)) el.classList.add('active');
   });
-  // Muat ulang konten
   renderGalleryItems();
 };
 
 window.openGallery = async function() {
   document.getElementById("gallery-modal").style.display = "flex";
-  currentGalleryTab = 'all'; // Reset ke 'Semua' saat dibuka
+  currentGalleryTab = 'all'; 
   switchGalleryTab('all');
 };
 
@@ -2152,18 +2219,15 @@ window.closeGallery = function() {
 async function renderGalleryItems() {
   const galleryGrid = document.getElementById("gallery-grid");
   
-  // Tampilkan loading hanya saat pertama kali dibuka
   if (!galleryGrid.innerHTML) {
     galleryGrid.innerHTML = "<div style='grid-column: 1/4; padding: 20px; text-align: center; color: #aaa;'>Memuat...</div>";
   }
 
-  // Matikan listener lama jika ada (mencegah tumpukan listener)
   if (galleryListener) galleryListener();
 
   try {
     const q = query(collection(db, "pesan"), orderBy("waktu", "desc"));
 
-    // Gunakan onSnapshot untuk memantau perubahan secara LIVE
     galleryListener = onSnapshot(q, (querySnapshot) => {
       galleryGrid.innerHTML = "";
       let mediaCount = 0;
@@ -2181,7 +2245,6 @@ async function renderGalleryItems() {
             let isVid = file.type.startsWith('video/');
             let isDoc = !isImg && !isVid;
 
-            // Filter Tab
             if (
               (currentGalleryTab === 'all' && (isImg || isVid || isDoc)) ||
               (currentGalleryTab === 'image' && isImg) ||
